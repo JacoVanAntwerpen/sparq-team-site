@@ -1,10 +1,27 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
-import TeamGrid from '@components/TeamGrid.astro';
+import { getCollection } from 'astro:content';
+
+const team = (await getCollection('team')).sort((a,b) => (a.data.order ?? 999) - (b.data.order ?? 999));
 ---
 <BaseLayout title="Team — SPARQ Team">
   <Section id="team-page" title="Team" subtitle="Add bios, headshots, and links.">
-    <TeamGrid />
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {team.map(m => (
+        <a href={`/team/${m.slug}`} class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow block">
+          <div class="flex items-start gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-200 to-blue-200 text-sm font-semibold text-neutral-700">
+              {m.data.initials ?? (m.data.name?.split(' ').map(x=>x[0]).join('').slice(0,2))}
+            </div>
+            <div>
+              <h3 class="font-semibold">{(m.data.prefix ? m.data.prefix + ' ' : '') + m.data.name}</h3>
+              <p class="text-sm text-neutral-600">{m.data.title}</p>
+              <p class="mt-2 text-sm text-neutral-700">{m.data.shortSummary}</p>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
   </Section>
 </BaseLayout>

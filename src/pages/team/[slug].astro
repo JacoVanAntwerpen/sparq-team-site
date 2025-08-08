@@ -1,0 +1,46 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Section from '@components/Section.astro';
+import { getCollection, getEntryBySlug } from 'astro:content';
+export async function getStaticPaths() {
+  const entries = await getCollection('team');
+  return entries.map((e) => ({ params: { slug: e.slug }, props: { entry: e } }));
+}
+const { entry } = Astro.props;
+const projects = await getCollection('projects');
+const pubs = await getCollection('publications');
+
+const linkedProjects = projects.filter(p => entry.data.linkedProjects?.includes(p.slug));
+const linkedPubs = pubs.filter(p => entry.data.linkedPublications?.includes(p.slug));
+---
+<BaseLayout title={`${entry.data.name} — SPARQ Team`}>
+  <Section title={`${entry.data.prefix ? entry.data.prefix + ' ' : ''}${entry.data.name}`} subtitle={entry.data.title}>
+    <div class="prose max-w-none">
+      {entry.data.longSummary && <p>{entry.data.longSummary}</p>}
+      <slot />
+    </div>
+
+    <div class="mt-6 space-y-2 text-sm">
+      {entry.data.email && <div>Email: <a class="text-blue-700" href={`mailto:${entry.data.email}`}>{entry.data.email}</a></div>}
+      {entry.data.linkedin && <div>LinkedIn: <a class="text-blue-700" href={entry.data.linkedin}>{entry.data.linkedin}</a></div>}
+    </div>
+
+    {linkedProjects.length > 0 && (
+      <div class="mt-10">
+        <h3 class="font-semibold mb-3">Projects</h3>
+        <ul class="list-disc pl-5">
+          {linkedProjects.map(p => (<li><a class="text-blue-700" href={`/projects/${p.slug}`}>{p.data.title}</a></li>))}
+        </ul>
+      </div>
+    )}
+
+    {linkedPubs.length > 0 && (
+      <div class="mt-10">
+        <h3 class="font-semibold mb-3">Publications</h3>
+        <ul class="list-disc pl-5">
+          {linkedPubs.map(p => (<li><a class="text-blue-700" href={`/publications#${p.slug}`}>{p.data.title}</a></li>))}
+        </ul>
+      </div>
+    )}
+  </Section>
+</BaseLayout>

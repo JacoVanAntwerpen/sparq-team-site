@@ -1,0 +1,35 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Section from '@components/Section.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('projects');
+  return entries.map((e) => ({ params: { slug: e.slug }, props: { entry: e } }));
+}
+const { entry } = Astro.props;
+---
+<BaseLayout title={`${entry.data.title} — SPARQ Projects`}>
+  <Section title={entry.data.title} subtitle={entry.data.completed ? `Completed: ${entry.data.completed}` : undefined}>
+    {entry.data.heroImage && <img src={entry.data.heroImage} alt="" class="mb-6 rounded-xl border" />}
+    <div class="prose max-w-none">
+      <p>{entry.data.longDetails ?? entry.body}</p>
+    </div>
+    {entry.data.links?.length > 0 && (
+      <div class="mt-8">
+        <h3 class="font-semibold mb-2">Links</h3>
+        <ul class="list-disc pl-5">
+          {entry.data.links.map(l => (<li><a class="text-blue-700" href={l.url}>{l.label}</a></li>))}
+        </ul>
+      </div>
+    )}
+    {entry.data.files?.length > 0 && (
+      <div class="mt-8">
+        <h3 class="font-semibold mb-2">Downloads</h3>
+        <ul class="list-disc pl-5">
+          {entry.data.files.map(f => (<li><a class="text-blue-700" href={f.file} download>{f.label}</a></li>))}
+        </ul>
+      </div>
+    )}
+  </Section>
+</BaseLayout>

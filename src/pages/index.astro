@@ -1,29 +1,67 @@
 ---
+// src/pages/index.astro
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
 import Hero from '@components/Hero.astro';
-import ExpertiseGrid from '@components/ExpertiseGrid.astro';
-import TeamGrid from '@components/TeamGrid.astro';
-import ProjectsGrid from '@components/ProjectsGrid.astro';
 import Collaborators from '@components/Collaborators.astro';
 import ContactForm from '@components/ContactForm.astro';
+import ExpertiseGrid from '@components/ExpertiseGrid.astro'
+
+import { getCollection } from 'astro:content';
+const allProjects = await getCollection('projects');
+const featured = allProjects.filter(p => p.data.featured).slice(0, 6);
+
+const team = (await getCollection('team'))
+  .sort((a,b) => (a.data.order ?? 999) - (b.data.order ?? 999))
+  .slice(0,4);
 ---
 <BaseLayout title="SPARQ Team — Home">
   <Hero />
 
   <Section id="expertise" title="Core areas of expertise" subtitle="Swap in your own language and icons.">
+    <!-- keep your existing ExpertiseGrid if you like -->
+    <!-- Or we can migrate Expertise to a collection later -->
     <ExpertiseGrid />
   </Section>
 
   <Section id="team" title="Our team" subtitle="Meet the people behind the models.">
-    <TeamGrid />
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {team.map(m => (
+        <a href={`/team/${m.slug}`} class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow block">
+          <div class="flex items-start gap-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-200 to-blue-200 text-sm font-semibold text-neutral-700">
+              {m.data.initials ?? (m.data.name?.split(' ').map(x=>x[0]).join('').slice(0,2))}
+            </div>
+            <div>
+              <h3 class="font-semibold">{(m.data.prefix ? m.data.prefix + ' ' : '') + m.data.name}</h3>
+              <p class="text-sm text-neutral-600">{m.data.title}</p>
+              <p class="mt-2 text-sm text-neutral-700 line-clamp-3">{m.data.shortSummary}</p>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
     <div class="mt-8">
       <a href="/team" class="rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-neutral-50">View full team</a>
     </div>
   </Section>
 
   <Section id="projects" title="Featured projects" subtitle="Representative work—replace with your own.">
-    <ProjectsGrid />
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {featured.map(p => (
+        <a href={`/projects/${p.slug}`} class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow block">
+          <div class="flex h-full flex-col justify-between">
+            <div>
+              <h3 class="font-semibold">{p.data.title}</h3>
+              <p class="mt-2 text-sm text-neutral-700">{p.data.shortDescription}</p>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              {(p.data.tags ?? []).map(t => (<span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium border-neutral-200 bg-white/60 backdrop-blur">{t}</span>))}
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
   </Section>
 
   <Section id="collaborators" title="Collaborators & partners" edge={true}>
