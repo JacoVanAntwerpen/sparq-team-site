@@ -1,0 +1,17 @@
+---
+import Icon from '@components/Icon.astro';
+import { EXPERTISE } from '@data/expertise';
+---
+<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  {EXPERTISE.map(x => (
+    <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-start gap-4">
+        <div class="mt-1 text-blue-600"><Icon name={x.icon}/></div>
+        <div>
+          <h3 class="font-semibold">{x.title}</h3>
+          <p class="mt-1 text-sm text-neutral-600">{x.blurb}</p>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>

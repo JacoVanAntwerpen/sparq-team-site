@@ -1,0 +1,18 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Section from '@components/Section.astro';
+import { PUBLICATIONS } from '@data/publications';
+---
+<BaseLayout title="Publications — SPARQ Team">
+  <Section id="pubs" title="Publications" subtitle="Add DOIs, PDFs, and citations.">
+    <div class="divide-y rounded-2xl border border-neutral-200 bg-white">
+      {PUBLICATIONS.map((p, i) => (
+        <div class="p-5 border-t:first:border-t-0">
+          <div class="font-medium">{p.title}</div>
+          <div class="text-sm text-neutral-600">{p.outlet}</div>
+          <a href={p.link} class="mt-2 inline-block text-sm text-blue-700 hover:underline">View →</a>
+        </div>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>

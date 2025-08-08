@@ -1,0 +1,36 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Section from '@components/Section.astro';
+import Hero from '@components/Hero.astro';
+import ExpertiseGrid from '@components/ExpertiseGrid.astro';
+import TeamGrid from '@components/TeamGrid.astro';
+import ProjectsGrid from '@components/ProjectsGrid.astro';
+import Collaborators from '@components/Collaborators.astro';
+import ContactForm from '@components/ContactForm.astro';
+---
+<BaseLayout title="SPARQ Team — Home">
+  <Hero />
+
+  <Section id="expertise" title="Core areas of expertise" subtitle="Swap in your own language and icons.">
+    <ExpertiseGrid />
+  </Section>
+
+  <Section id="team" title="Our team" subtitle="Meet the people behind the models.">
+    <TeamGrid />
+    <div class="mt-8">
+      <a href="/team" class="rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-neutral-50">View full team</a>
+    </div>
+  </Section>
+
+  <Section id="projects" title="Featured projects" subtitle="Representative work—replace with your own.">
+    <ProjectsGrid />
+  </Section>
+
+  <Section id="collaborators" title="Collaborators & partners" edge={true}>
+    <Collaborators />
+  </Section>
+
+  <Section id="contact" title="Contact" subtitle="Tell us about your project.">
+    <ContactForm />
+  </Section>
+</BaseLayout>

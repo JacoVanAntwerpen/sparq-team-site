@@ -1,0 +1,12 @@
+---
+const { name = 'doc-lines' } = Astro.props;
+const paths = {
+  'chart-bar': '<path d="M3 3h2v18H3zM7 13h4v8H7zM13 8h4v13h-4zM19 4h2v17h-2z"/>',
+  'slider': '<path d="M3 13h2v-2H3v2zm4 0h14v-2H7v2zM3 7h18V5H3v2zm0 12h18v-2H3v2z"/>',
+  'doc-lines': '<path d="M4 4h16v2H4zm0 4h10v2H4zm0 4h7v2H4zm0 4h13v2H4z"/>',
+  'window': '<path d="M5 3h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4l-4 4-4-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>',
+  'pin': '<path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>',
+  'compass': '<path d="M12 2l4 4-4 4-4-4 4-4zm-7 9h14v2H5v-2zm3 5h8v2H8v-2z"/>'
+};
+---
+<svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" innerHTML={paths[name] ?? paths['doc-lines']} />
