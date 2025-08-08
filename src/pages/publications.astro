@@ -1,16 +1,19 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
-import { PUBLICATIONS } from '@data/publications';
+import { getCollection } from 'astro:content';
+const pubs = await getCollection('publications');
 ---
 <BaseLayout title="Publications — SPARQ Team">
   <Section id="pubs" title="Publications" subtitle="Add DOIs, PDFs, and citations.">
     <div class="divide-y rounded-2xl border border-neutral-200 bg-white">
-      {PUBLICATIONS.map((p, i) => (
-        <div class="p-5 border-t:first:border-t-0">
-          <div class="font-medium">{p.title}</div>
-          <div class="text-sm text-neutral-600">{p.outlet}</div>
-          <a href={p.link} class="mt-2 inline-block text-sm text-blue-700 hover:underline">View →</a>
+      {pubs.map((p) => (
+        <div id={p.slug} class="p-5">
+          <div class="font-medium">{p.data.title}</div>
+          {p.data.heroImage && <img src={p.data.heroImage} alt="" class="my-3 rounded-xl border" />}
+          {p.data.abstract && <p class="text-sm text-neutral-700">{p.data.abstract}</p>}
+          {p.data.authors?.length > 0 && <div class="text-xs text-neutral-600 mt-1">Authors: {p.data.authors.join(", ")}</div>}
+          <a href={p.data.url} class="mt-2 inline-block text-sm text-blue-700 hover:underline">View publication →</a>
         </div>
       ))}
     </div>
