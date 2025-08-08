@@ -5,6 +5,7 @@ import Section from '@components/Section.astro';
 import Hero from '@components/Hero.astro';
 import Collaborators from '@components/Collaborators.astro';
 import ContactForm from '@components/ContactForm.astro';
+import ExpertiseGrid from '@components/ExpertiseGrid.astro'
 
 import { getCollection } from 'astro:content';
 const allProjects = await getCollection('projects');
@@ -20,7 +21,7 @@ const team = (await getCollection('team'))
   <Section id="expertise" title="Core areas of expertise" subtitle="Swap in your own language and icons.">
     <!-- keep your existing ExpertiseGrid if you like -->
     <!-- Or we can migrate Expertise to a collection later -->
-    <div class="text-sm text-neutral-500">Expertise grid unchanged for now.</div>
+    <ExpertiseGrid />
   </Section>
 
   <Section id="team" title="Our team" subtitle="Meet the people behind the models.">
