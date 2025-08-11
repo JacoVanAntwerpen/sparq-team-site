@@ -16,29 +16,59 @@ const {
     <meta name="description" content={description} />
     <title>{title}</title>
 
-    <!-- Netlify Identity (needed to process invite links & login; no visible UI) -->
+    <!-- Netlify Identity (needed to process invite links & show login modal) -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script>
-      // Process invite links anywhere on the site without showing a button.
-      // Also redirect editors to /admin after a successful login.
-      document.addEventListener('DOMContentLoaded', function () {
-        if (!window.netlifyIdentity) return;
+      (function () {
+        function getInviteToken() {
+          // Accept "#invite_token=..." or "?invite_token=..." just in case
+          const fromHash = new URLSearchParams(location.hash.slice(1)).get('invite_token');
+          const fromQuery = new URLSearchParams(location.search).get('invite_token');
+          return fromHash || fromQuery || null;
+        }
 
-        const hasInvite = location.hash && location.hash.includes('invite_token');
-
-        window.netlifyIdentity.on('init', (user) => {
-          if (!user && hasInvite) {
-            // Open the signup modal so the user can set a password/verify
-            window.netlifyIdentity.open('signup');
-          }
-        });
-
-        window.netlifyIdentity.on('login', () => {
+        function goToAdminIfNotAlready() {
           if (!location.pathname.startsWith('/admin')) {
             location.href = '/admin/';
           }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+          if (!window.netlifyIdentity) return;
+
+          // Always init explicitly; some setups need this
+          window.netlifyIdentity.init();
+
+          const inviteToken = getInviteToken();
+
+          // If landing from an invite link and not logged in, complete signup
+          window.netlifyIdentity.on('init', (user) => {
+            if (!user && inviteToken) {
+              // Try native acceptInvite API first (best UX)
+              window.netlifyIdentity
+                .acceptInvite(inviteToken, true /* setPassword */)
+                .then(() => {
+                  // Success; go to admin
+                  goToAdminIfNotAlready();
+                })
+                .catch(() => {
+                  // Fallback: open signup modal
+                  window.netlifyIdentity.open('signup');
+                });
+            }
+
+            // If you’re on /admin and not logged in, open the login modal
+            if (!user && location.pathname.startsWith('/admin')) {
+              window.netlifyIdentity.open('login');
+            }
+          });
+
+          // After login, head to /admin
+          window.netlifyIdentity.on('login', () => {
+            goToAdminIfNotAlready();
+          });
         });
-      });
+      })();
     </script>
   </head>
   <body class="min-h-screen bg-gradient-to-b from-white to-neutral-50 text-neutral-900">
