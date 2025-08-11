@@ -4,44 +4,30 @@
     <meta charset="utf-8" />
     <title>SPARQ Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Netlify Identity (required for login/signup modals) -->
+    <!-- Identity + Decap -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <!-- Decap CMS bundle -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     <style>
-      /* lightweight styling so you see the auth controls before logging in */
-      .auth-wrap {
-        position: fixed; inset: 0; display: grid; place-items: center;
-        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      }
-      .auth-card {
-        border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px 24px;
-        background: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.06); width: 360px; max-width: 90vw;
-      }
-      .auth-actions { display: flex; gap: 8px; margin-top: 12px; }
-      .btn {
-        appearance: none; border: 1px solid #e5e7eb; background: #111827; color: #fff;
-        padding: 10px 14px; border-radius: 10px; font-weight: 600; cursor: pointer;
-      }
-      .btn.secondary { background: #fff; color: #111827; }
-      .hint { color: #6b7280; font-size: 12px; margin-top: 8px; line-height: 1.4; }
-      .hidden { display: none; }
+      .auth-wrap{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;z-index:9999;background:transparent}
+      .auth-card{border:1px solid #e5e7eb;border-radius:14px;padding:20px 24px;background:#fff;box-shadow:0 10px 25px rgba(0,0,0,.06);width:360px;max-width:90vw}
+      .auth-actions{display:flex;gap:8px;margin-top:12px}
+      .btn{border:1px solid #e5e7eb;background:#111827;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+      .btn.secondary{background:#fff;color:#111827}
+      .hint{color:#6b7280;font-size:12px;margin-top:8px;line-height:1.4}
+      .hidden{display:none}
     </style>
   </head>
   <body>
     <noscript>This page requires JavaScript to run Decap CMS.</noscript>
 
-    <div id="auth" class="auth-wrap">
+    <div id="auth" class="auth-wrap hidden">
       <div class="auth-card">
         <h2 style="margin:0 0 10px 0;">SPARQ Admin</h2>
         <div>Sign in to edit site content.</div>
         <div class="auth-actions">
           <button id="loginBtn" class="btn">Log in</button>
           <button id="signupBtn" class="btn secondary">Sign up</button>
-        </div>
-        <div class="hint">
-          Use the email that was invited in Netlify Identity. If you just clicked an invite
-          link, this page will finish verification automatically.
+          <button id="logoutBtn" class="btn secondary hidden">Log out</button>
         </div>
         <div id="status" class="hint"></div>
       </div>
@@ -53,73 +39,94 @@
         const statusEl = document.getElementById('status');
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
 
-        function getInviteToken() {
-          const hashParams = new URLSearchParams(location.hash.slice(1));
-          const queryParams = new URLSearchParams(location.search);
-          return hashParams.get('invite_token') || queryParams.get('invite_token');
+        function setStatus(msg){ statusEl.textContent = msg || ''; }
+        function hideAuth(){ authWrap.classList.add('hidden'); }
+        function showAuth(){ authWrap.classList.remove('hidden'); }
+        function cleanURL(){ if (location.hash || location.search) history.replaceState({}, '', '/admin/'); }
+
+        function getTokenParam() {
+          const hash = new URLSearchParams(location.hash.slice(1));
+          const invite = hash.get('invite_token');
+          const confirm = hash.get('confirmation_token');
+          return invite ? { kind: 'invite_token', value: invite }
+               : confirm ? { kind: 'confirmation_token', value: confirm }
+               : null;
         }
 
-        function hideAuthUI() { authWrap.classList.add('hidden'); }
-        function showAuthUI() { authWrap.classList.remove('hidden'); }
-        function setStatus(msg) { statusEl.textContent = msg || ''; }
+        // 1) Init Identity ASAP (no need to wait for DOM)
+        if (window.netlifyIdentity) window.netlifyIdentity.init();
 
         document.addEventListener('DOMContentLoaded', function () {
-          if (!window.netlifyIdentity) {
-            setStatus('Identity widget not loaded.');
-            return;
+          if (!window.netlifyIdentity) { console.warn('Identity widget not loaded'); return; }
+
+          // Buttons
+          loginBtn.addEventListener('click', () => window.netlifyIdentity.open('login'));
+          signupBtn.addEventListener('click', () => window.netlifyIdentity.open('signup'));
+          logoutBtn.addEventListener('click', () => window.netlifyIdentity.logout());
+
+          // 2) If already logged in when the page loads, hide overlay immediately
+          const existing = window.netlifyIdentity.currentUser();
+          if (existing) {
+            setStatus(`Logged in as ${existing.email || 'user'}`);
+            hideAuth();
+            cleanURL();
+          } else {
+            showAuth(); // show controls while we detect tokens or wait for login
           }
-          // Ensure widget is ready
-          window.netlifyIdentity.init();
 
-          const inviteToken = getInviteToken();
+          // 3) Process invite/confirmation tokens if present
+          const tok = getTokenParam();
+          if (tok && !existing) {
+            setStatus('Processing invite/confirmation…');
+            const p = tok.kind === 'invite_token'
+              ? window.netlifyIdentity.acceptInvite(tok.value, true)
+              : window.netlifyIdentity.confirm(tok.value, true);
 
-          // Wire buttons
-          loginBtn.addEventListener('click', function () {
-            window.netlifyIdentity.open('login');
+            Promise.resolve(p)
+              .then(() => {
+                setStatus('Verified. Loading admin…');
+                hideAuth();
+                cleanURL();
+              })
+              .catch((e) => {
+                console.warn('Token handling failed', e);
+                setStatus('Token detected. Please complete in the dialog.');
+                window.netlifyIdentity.open(tok.kind === 'invite_token' ? 'signup' : 'login');
+              });
+          }
+
+          // 4) React to state changes
+          window.netlifyIdentity.on('login', (user) => {
+            setStatus(user && user.email ? `Logged in as ${user.email}` : 'Logged in');
+            hideAuth();
+            cleanURL();
           });
-          signupBtn.addEventListener('click', function () {
-            window.netlifyIdentity.open('signup');
+
+          window.netlifyIdentity.on('logout', () => {
+            setStatus('Logged out');
+            showAuth();
           });
 
-          // Init handler
           window.netlifyIdentity.on('init', (user) => {
+            // If init fires late and user exists, hide UI
             if (user) {
-              // Already logged in -> hide auth and let CMS show
-              hideAuthUI();
-              return;
-            }
-            // If we landed with an invite token, try to accept it silently
-            if (inviteToken) {
-              setStatus('Processing invite…');
-              window.netlifyIdentity
-                .acceptInvite(inviteToken, true /* setPassword */)
-                .then(() => {
-                  setStatus('Invite accepted. Opening admin…');
-                  hideAuthUI();
-                  // Remove token from URL to avoid re-processing
-                  history.replaceState({}, '', '/admin/');
-                })
-                .catch(() => {
-                  // Fall back to showing the signup dialog
-                  setStatus('Invite found. Please complete signup.');
-                  showAuthUI();
-                  window.netlifyIdentity.open('signup');
-                });
+              setStatus(`Logged in as ${user.email || 'user'}`);
+              hideAuth();
+              cleanURL();
             } else {
-              // No token; show login/signup controls
-              showAuthUI();
+              // show controls if still no user
+              showAuth();
             }
           });
 
-          // After a successful login, hide the auth UI
-          window.netlifyIdentity.on('login', () => {
-            hideAuthUI();
-            // Ensure any leftover hash/query is cleared
-            if (location.hash || location.search) {
-              history.replaceState({}, '', '/admin/');
-            }
-          });
+          // 5) Optional: show a logout button if user becomes available later
+          const refreshUI = () => {
+            const u = window.netlifyIdentity.currentUser();
+            logoutBtn.classList.toggle('hidden', !u);
+          };
+          setInterval(refreshUI, 1000); // cheap but effective UI sync
         });
       })();
     </script>
