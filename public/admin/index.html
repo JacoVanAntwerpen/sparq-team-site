@@ -4,22 +4,28 @@
     <meta charset="utf-8" />
     <title>SPARQ Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Identity + Decap -->
+
+    <!-- Netlify Identity widget (login/signup + invite handling) -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+    <!-- Decap CMS bundle -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
     <style>
-      .auth-wrap{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;z-index:1;background:transparent}
+      .auth-wrap{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;z-index:1;background:transparent}
       .auth-card{border:1px solid #e5e7eb;border-radius:14px;padding:20px 24px;background:#fff;box-shadow:0 10px 25px rgba(0,0,0,.06);width:360px;max-width:90vw}
       .auth-actions{display:flex;gap:8px;margin-top:12px}
       .btn{border:1px solid #e5e7eb;background:#111827;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
       .btn.secondary{background:#fff;color:#111827}
       .hint{color:#6b7280;font-size:12px;margin-top:8px;line-height:1.4}
       .hidden{display:none}
+      #cms-status{position:fixed;left:12px;bottom:12px;font:12px/1.3 system-ui;color:#6b7280}
     </style>
   </head>
   <body>
     <noscript>This page requires JavaScript to run Decap CMS.</noscript>
 
+    <!-- Lightweight auth helper UI (stays behind the Netlify modal) -->
     <div id="auth" class="auth-wrap hidden">
       <div class="auth-card">
         <h2 style="margin:0 0 10px 0;">SPARQ Admin</h2>
@@ -33,6 +39,8 @@
       </div>
     </div>
 
+    <div id="cms-status"></div>
+
     <script>
       (function () {
         const authWrap = document.getElementById('auth');
@@ -40,11 +48,13 @@
         const loginBtn = document.getElementById('loginBtn');
         const signupBtn = document.getElementById('signupBtn');
         const logoutBtn = document.getElementById('logoutBtn');
+        const cmsStatus = document.getElementById('cms-status');
 
-        function setStatus(msg){ statusEl.textContent = msg || ''; }
-        function hideAuth(){ authWrap.classList.add('hidden'); }
-        function showAuth(){ authWrap.classList.remove('hidden'); }
-        function cleanURL(){ if (location.hash || location.search) history.replaceState({}, '', '/admin/'); }
+        const setStatus = (m) => statusEl.textContent = m || '';
+        const setCMS = (m) => cmsStatus.textContent = m || '';
+        const hideAuth = () => authWrap.classList.add('hidden');
+        const showAuth = () => authWrap.classList.remove('hidden');
+        const cleanURL = () => { if (location.hash || location.search) history.replaceState({}, '', '/admin/'); };
 
         function getTokenParam() {
           const hash = new URLSearchParams(location.hash.slice(1));
@@ -55,10 +65,11 @@
                : null;
         }
 
+        // Initialize Identity ASAP
         if (window.netlifyIdentity) window.netlifyIdentity.init();
 
         document.addEventListener('DOMContentLoaded', function () {
-          if (!window.netlifyIdentity) { console.warn('Identity widget not loaded'); return; }
+          if (!window.netlifyIdentity) { setCMS('Identity widget not loaded'); return; }
 
           // Buttons — hide overlay BEFORE opening the modal so it can't block clicks
           loginBtn.addEventListener('click', () => { hideAuth(); window.netlifyIdentity.open('login'); });
@@ -72,7 +83,7 @@
           const tok = getTokenParam();
           if (tok && !existing) {
             setStatus('Processing invite/confirmation…');
-            hideAuth(); // ensure the modal is fully clickable
+            hideAuth(); // ensure Netlify modal is clickable
             const p = tok.kind === 'invite_token'
               ? window.netlifyIdentity.acceptInvite(tok.value, true)
               : window.netlifyIdentity.confirm(tok.value, true);
@@ -81,7 +92,7 @@
               .then(() => { setStatus('Verified. Loading admin…'); hideAuth(); cleanURL(); })
               .catch(() => {
                 setStatus('Token detected. Complete in the dialog.');
-                hideAuth(); // keep it hidden while modal is open
+                hideAuth();
                 window.netlifyIdentity.open(tok.kind === 'invite_token' ? 'signup' : 'login');
               });
           }
@@ -89,11 +100,30 @@
           window.netlifyIdentity.on('login', (user) => { setStatus(`Logged in as ${user.email||'user'}`); hideAuth(); cleanURL(); });
           window.netlifyIdentity.on('logout', () => { setStatus('Logged out'); showAuth(); });
 
-          // keep logout button state in sync
+          // Keep logout button state in sync
           setInterval(() => {
             const u = window.netlifyIdentity.currentUser();
             logoutBtn.classList.toggle('hidden', !u);
           }, 1000);
+
+          // ---- SAFE CMS INITIALIZATION ----
+          // Wait until the DOM is ready AND the CMS global exists, then init.
+          function initCMSWhenReady(attempt = 0) {
+            if (typeof CMS === 'undefined') {
+              if (attempt < 50) return setTimeout(() => initCMSWhenReady(attempt + 1), 100);
+              console.error('Decap CMS failed to load.');
+              return setCMS('CMS failed to load (check console/network).');
+            }
+            try {
+              setCMS('Initializing CMS…');
+              CMS.init({ config: { load_config_file: true } }); // loads /admin/config.yml
+              setCMS('CMS initialized');
+            } catch (e) {
+              console.error('CMS init error:', e);
+              setCMS('CMS failed to initialize (see console).');
+            }
+          }
+          initCMSWhenReady();
         });
       })();
     </script>
