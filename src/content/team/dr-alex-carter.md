@@ -1,5 +1,4 @@
 ---
-// src/content/team/dr-alex-carter.md
 prefix: "Dr."
 name: "Alex Carter"
 title: "Director, TEA & Strategy"

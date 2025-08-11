@@ -1,8 +1,22 @@
 // src/content/config.ts
 import { defineCollection, z } from "astro:content";
 
-const link = z.object({ label: z.string(), url: z.string().url() });
-const fileRef = z.object({ label: z.string(), file: z.string() }); // path in /public/uploads or absolute
+// Accept absolute URLs, site-relative paths, or anchors
+const urlSchema = z.union([
+  z.string().url(),            // https://example.com
+  z.string().startsWith("/"),  // /relative/path
+  z.string().startsWith("#"),  // #anchor
+]);
+
+const link = z.object({
+  label: z.string(),
+  url: urlSchema,
+});
+
+const fileRef = z.object({
+  label: z.string(),
+  file: z.string(), // path in /public/uploads or absolute
+});
 
 // TEAM
 const team = defineCollection({
@@ -14,7 +28,7 @@ const team = defineCollection({
     shortSummary: z.string().max(200),
     longSummary: z.string().optional(), // can also use body markdown
     email: z.string().email().optional(),
-    linkedin: z.string().url().optional(),
+    linkedin: urlSchema.optional(),
     headshot: z.string().optional(), // /uploads/<file>
     linkedProjects: z.array(z.string()).default([]), // slugs of projects
     linkedPublications: z.array(z.string()).default([]), // slugs of publications
@@ -34,7 +48,7 @@ const projects = defineCollection({
     files: z.array(fileRef).default([]),
     heroImage: z.string().optional(),
     tileImage: z.string().optional(),
-    completed: z.string().optional(), // ISO date
+    completed: z.string().optional(), // ISO date (YYYY-MM-DD)
     featured: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
   }),
@@ -47,7 +61,7 @@ const publications = defineCollection({
     title: z.string(),
     heroImage: z.string().optional(),
     abstract: z.string().optional(), // or body
-    url: z.string().url(),
+    url: urlSchema, // usually absolute, but allow relative if needed
     authors: z.array(z.string()).default([]),
     linkedProjects: z.array(z.string()).default([]),
     year: z.number().optional(),

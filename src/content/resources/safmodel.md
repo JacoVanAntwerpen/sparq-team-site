@@ -1,5 +1,4 @@
 ---
-// src/content/resources/safmodel.md
 title: "SAFmodel"
 oneLine: "Compare BTL/PTL configs with hourly-resolved TEA-LCA and sensitivity."
 summary: "Scenario-rich evaluation framework with harmonised boundary assumptions."
