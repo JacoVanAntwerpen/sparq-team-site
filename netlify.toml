@@ -4,3 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "20"
+
+# Let /admin (without trailing slash) load the admin shell:
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200

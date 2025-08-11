@@ -4,27 +4,12 @@
     <meta charset="utf-8" />
     <title>SPARQ Admin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Netlify Identity widget (required for git-gateway login) -->
+    <!-- Netlify Identity (required for git-gateway login modal) -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <!-- Decap CMS bundle -->
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   </head>
   <body>
     <noscript>This page requires JavaScript to run Decap CMS.</noscript>
-    <!-- Optional helper button if you want a visible login control -->
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', (user) => {
-          if (!user) {
-            const btn = document.createElement('button');
-            btn.textContent = 'Log in';
-            btn.style.cssText =
-              'position:fixed;top:16px;right:16px;padding:8px 12px;z-index:9999;';
-            btn.onclick = () => window.netlifyIdentity.open();
-            document.body.appendChild(btn);
-          }
-        });
-      }
-    </script>
   </body>
 </html>

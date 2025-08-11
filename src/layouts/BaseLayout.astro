@@ -2,7 +2,11 @@
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import '@styles/tailwind.css';
-const { title = 'SPARQ Team', description = 'Techno‑economic analysis for net‑zero', } = Astro.props;
+
+const {
+  title = 'SPARQ Team',
+  description = 'Techno-economic analysis for net-zero',
+} = Astro.props;
 ---
 <html lang="en">
   <head>
@@ -11,6 +15,31 @@ const { title = 'SPARQ Team', description = 'Techno‑economic analysis for net�
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
+
+    <!-- Netlify Identity (needed to process invite links & login; no visible UI) -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script>
+      // Process invite links anywhere on the site without showing a button.
+      // Also redirect editors to /admin after a successful login.
+      document.addEventListener('DOMContentLoaded', function () {
+        if (!window.netlifyIdentity) return;
+
+        const hasInvite = location.hash && location.hash.includes('invite_token');
+
+        window.netlifyIdentity.on('init', (user) => {
+          if (!user && hasInvite) {
+            // Open the signup modal so the user can set a password/verify
+            window.netlifyIdentity.open('signup');
+          }
+        });
+
+        window.netlifyIdentity.on('login', () => {
+          if (!location.pathname.startsWith('/admin')) {
+            location.href = '/admin/';
+          }
+        });
+      });
+    </script>
   </head>
   <body class="min-h-screen bg-gradient-to-b from-white to-neutral-50 text-neutral-900">
     <Header />
