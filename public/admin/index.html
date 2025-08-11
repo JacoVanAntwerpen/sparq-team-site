@@ -8,7 +8,7 @@
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     <style>
-      .auth-wrap{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;z-index:9999;background:transparent}
+      .auth-wrap{position:fixed;inset:0;display:grid;place-items:center;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;z-index:1;background:transparent}
       .auth-card{border:1px solid #e5e7eb;border-radius:14px;padding:20px 24px;background:#fff;box-shadow:0 10px 25px rgba(0,0,0,.06);width:360px;max-width:90vw}
       .auth-actions{display:flex;gap:8px;margin-top:12px}
       .btn{border:1px solid #e5e7eb;background:#111827;color:#fff;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
@@ -55,78 +55,45 @@
                : null;
         }
 
-        // 1) Init Identity ASAP (no need to wait for DOM)
         if (window.netlifyIdentity) window.netlifyIdentity.init();
 
         document.addEventListener('DOMContentLoaded', function () {
           if (!window.netlifyIdentity) { console.warn('Identity widget not loaded'); return; }
 
-          // Buttons
-          loginBtn.addEventListener('click', () => window.netlifyIdentity.open('login'));
-          signupBtn.addEventListener('click', () => window.netlifyIdentity.open('signup'));
+          // Buttons — hide overlay BEFORE opening the modal so it can't block clicks
+          loginBtn.addEventListener('click', () => { hideAuth(); window.netlifyIdentity.open('login'); });
+          signupBtn.addEventListener('click', () => { hideAuth(); window.netlifyIdentity.open('signup'); });
           logoutBtn.addEventListener('click', () => window.netlifyIdentity.logout());
 
-          // 2) If already logged in when the page loads, hide overlay immediately
           const existing = window.netlifyIdentity.currentUser();
-          if (existing) {
-            setStatus(`Logged in as ${existing.email || 'user'}`);
-            hideAuth();
-            cleanURL();
-          } else {
-            showAuth(); // show controls while we detect tokens or wait for login
-          }
+          if (existing) { setStatus(`Logged in as ${existing.email||'user'}`); hideAuth(); cleanURL(); }
+          else { showAuth(); }
 
-          // 3) Process invite/confirmation tokens if present
           const tok = getTokenParam();
           if (tok && !existing) {
             setStatus('Processing invite/confirmation…');
+            hideAuth(); // ensure the modal is fully clickable
             const p = tok.kind === 'invite_token'
               ? window.netlifyIdentity.acceptInvite(tok.value, true)
               : window.netlifyIdentity.confirm(tok.value, true);
 
             Promise.resolve(p)
-              .then(() => {
-                setStatus('Verified. Loading admin…');
-                hideAuth();
-                cleanURL();
-              })
-              .catch((e) => {
-                console.warn('Token handling failed', e);
-                setStatus('Token detected. Please complete in the dialog.');
+              .then(() => { setStatus('Verified. Loading admin…'); hideAuth(); cleanURL(); })
+              .catch(() => {
+                setStatus('Token detected. Complete in the dialog.');
+                hideAuth(); // keep it hidden while modal is open
                 window.netlifyIdentity.open(tok.kind === 'invite_token' ? 'signup' : 'login');
               });
           }
 
-          // 4) React to state changes
-          window.netlifyIdentity.on('login', (user) => {
-            setStatus(user && user.email ? `Logged in as ${user.email}` : 'Logged in');
-            hideAuth();
-            cleanURL();
-          });
+          window.netlifyIdentity.on('login', (user) => { setStatus(`Logged in as ${user.email||'user'}`); hideAuth(); cleanURL(); });
+          window.netlifyIdentity.on('logout', () => { setStatus('Logged out'); showAuth(); });
 
-          window.netlifyIdentity.on('logout', () => {
-            setStatus('Logged out');
-            showAuth();
-          });
-
-          window.netlifyIdentity.on('init', (user) => {
-            // If init fires late and user exists, hide UI
-            if (user) {
-              setStatus(`Logged in as ${user.email || 'user'}`);
-              hideAuth();
-              cleanURL();
-            } else {
-              // show controls if still no user
-              showAuth();
-            }
-          });
-
-          // 5) Optional: show a logout button if user becomes available later
-          const refreshUI = () => {
+          // keep logout button state in sync
+          setInterval(() => {
             const u = window.netlifyIdentity.currentUser();
             logoutBtn.classList.toggle('hidden', !u);
-          };
-          setInterval(refreshUI, 1000); // cheap but effective UI sync
+          }, 1000);
         });
       })();
     </script>
