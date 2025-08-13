@@ -32,9 +32,17 @@ collections:
           - { label: "File", name: "file", widget: "file" }
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - { label: "Tile image", name: "tileImage", widget: "image", required: false }
-      - { label: "Completion date", name: "completed", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+
+      # CHANGED: store as string, enforce YYYY-MM-DD
+      - label: "Completion date"
+        name: "completed"
+        widget: "string"
+        required: false
+        pattern: ["^\\d{4}-\\d{2}-\\d{2}$", "Use YYYY-MM-DD"]
+        hint: "Format: YYYY-MM-DD (e.g., 2024-12-01)"
+
       - { label: "Featured", name: "featured", widget: "boolean", default: false }
-      # FIX: tags must be a list of strings (not list of objects)
+      # list of strings
       - { label: "Tags", name: "tags", widget: "list", required: false }
 
   - name: team
@@ -52,7 +60,7 @@ collections:
       - { label: "Email", name: "email", widget: "string", required: false, pattern: ["^\\S+@\\S+\\.\\S+$", "Enter a valid email"] }
       - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false, pattern: ["^https?://", "Must start with http(s)"] }
       - { label: "Headshot", name: "headshot", widget: "image", required: false }
-      # FIX: linkedProjects/linkedPublications must be lists of strings (slugs)
+      # lists of strings (slugs)
       - { label: "Linked projects (slugs)", name: "linkedProjects", widget: "list", required: false }
       - { label: "Linked publications (slugs)", name: "linkedPublications", widget: "list", required: false }
       - { label: "Order", name: "order", widget: "number", required: false, default: 999 }
@@ -69,9 +77,9 @@ collections:
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - { label: "Abstract", name: "abstract", widget: "text", required: false }
       - { label: "URL", name: "url", widget: "string" }
-      # FIX: authors must be a list of strings
+      # list of strings
       - { label: "Authors", name: "authors", widget: "list" }
-      # FIX: linkedProjects must be a list of strings (slugs)
+      # list of strings (slugs)
       - { label: "Linked projects (slugs)", name: "linkedProjects", widget: "list", required: false }
       - { label: "Year", name: "year", widget: "number", required: false }
 
