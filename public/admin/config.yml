@@ -16,10 +16,10 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "One-line description", name: "shortDescription", widget: "string" }
 
-      # Nicer fallback if you don't want to use the builder
+      # Markdown fallback if you skip the builder
       - { label: "Long details (markdown fallback)", name: "longDetails", widget: "markdown", required: false }
 
-      # Content Builder (orderable blocks)
+      # Content Builder (typed / orderable blocks)
       - label: "Content Builder"
         name: "content"
         widget: "list"
@@ -38,7 +38,6 @@ collections:
                 widget: "select"
                 options: ["h2","h3","h4"]
                 default: "h2"
-
           - label: "Subheader"
             name: "subheader"
             widget: "object"
@@ -50,14 +49,12 @@ collections:
                 widget: "select"
                 options: ["h3","h4"]
                 default: "h3"
-
           - label: "Paragraph"
             name: "paragraph"
             widget: "object"
             summary: "Paragraph"
             fields:
               - { label: "Body (Markdown)", name: "body", widget: "markdown" }
-
           - label: "List"
             name: "list"
             widget: "object"
@@ -74,7 +71,6 @@ collections:
                 name: "items"
                 widget: "list"
                 field: { label: "Item", name: "item", widget: "string" }
-
           - label: "Link"
             name: "link"
             widget: "object"
@@ -82,7 +78,6 @@ collections:
             fields:
               - { label: "Label", name: "label", widget: "string" }
               - { label: "URL", name: "url", widget: "string" }
-
           - label: "File"
             name: "file"
             widget: "object"
@@ -91,7 +86,38 @@ collections:
               - { label: "Label", name: "label", widget: "string" }
               - { label: "File", name: "file", widget: "file" }
 
+      # Hero controls
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
+      - label: "Hero layout"
+        name: "heroLayout"
+        widget: "select"
+        required: false
+        default: "full"
+        options:
+          - { label: "Full (below title)", value: "full" }
+          - { label: "Banner (above title)", value: "banner" }
+          - { label: "Aside (portrait right)", value: "aside" }
+          - { label: "None", value: "none" }
+      - { label: "Hero alt text", name: "heroAlt", widget: "string", required: false }
+      - label: "Hero focal point"
+        name: "heroFocal"
+        widget: "select"
+        required: false
+        default: "center"
+        options:
+          - center
+          - top
+          - bottom
+          - left
+          - right
+          - top-left
+          - top-right
+          - bottom-left
+          - bottom-right
+      - { label: "Hero caption", name: "heroCaption", widget: "string", required: false }
+      - { label: "Hero credit (name)", name: "heroCredit", widget: "string", required: false }
+      - { label: "Hero credit URL", name: "heroCreditUrl", widget: "string", required: false }
+
       - { label: "Tile image (grid card)", name: "tileImage", widget: "image", required: false }
       - { label: "Completed (free text)", name: "completed", widget: "string", required: false }
       - { label: "Featured?", name: "featured", widget: "boolean", required: false, default: false }
@@ -101,7 +127,7 @@ collections:
         required: false
         field: { label: "Tag", name: "tag", widget: "string" }
 
-      # Keep existing bottom sections for compatibility
+      # Bottom sections (legacy/extra)
       - label: "Files (bottom section)"
         name: "files"
         widget: "list"
@@ -109,7 +135,6 @@ collections:
         fields:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "File", name: "file", widget: "file" }
-
       - label: "Links (bottom section)"
         name: "links"
         widget: "list"

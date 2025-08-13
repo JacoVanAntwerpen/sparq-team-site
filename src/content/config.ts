@@ -1,7 +1,6 @@
 // src/content/config.ts
 import { defineCollection, z } from "astro:content";
 
-/** URLs can be absolute, site-relative, or anchors */
 const urlSchema = z.union([
   z.string().url(),
   z.string().startsWith("/"),
@@ -18,66 +17,41 @@ const fileRef = z.object({
   file: z.string(),
 });
 
-/** Content Builder blocks (typed / discriminated) */
-const headerBlock = z.object({
-  type: z.literal("header"),
-  text: z.string(),
-  level: z.enum(["h2", "h3", "h4"]).default("h2"),
-});
-
-const subheaderBlock = z.object({
-  type: z.literal("subheader"),
-  text: z.string(),
-  level: z.enum(["h3", "h4"]).default("h3"),
-});
-
-const paragraphBlock = z.object({
-  type: z.literal("paragraph"),
-  body: z.string(), // markdown allowed
-});
-
-const listBlock = z.object({
-  type: z.literal("list"),
-  style: z.enum(["ul", "ol"]).default("ul"),
-  items: z.array(z.string()),
-});
-
-const linkBlock = z.object({
-  type: z.literal("link"),
-  label: z.string(),
-  url: urlSchema,
-});
-
-const fileBlock = z.object({
-  type: z.literal("file"),
-  label: z.string(),
-  file: z.string(),
-});
-
+/** Content Builder blocks */
 const contentBlock = z.discriminatedUnion("type", [
-  headerBlock,
-  subheaderBlock,
-  paragraphBlock,
-  listBlock,
-  linkBlock,
-  fileBlock,
+  z.object({ type: z.literal("header"), text: z.string(), level: z.enum(["h2","h3","h4"]).default("h2") }),
+  z.object({ type: z.literal("subheader"), text: z.string(), level: z.enum(["h3","h4"]).default("h3") }),
+  z.object({ type: z.literal("paragraph"), body: z.string() }), // markdown
+  z.object({ type: z.literal("list"), style: z.enum(["ul","ol"]).default("ul"), items: z.array(z.string()) }),
+  z.object({ type: z.literal("link"), label: z.string(), url: urlSchema }),
+  z.object({ type: z.literal("file"), label: z.string(), file: z.string() }),
 ]);
 
-/** Collections */
 const projects = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     shortDescription: z.string(),
-    longDetails: z.string().optional(), // legacy fallback
+    longDetails: z.string().optional(),   // legacy fallback
+    // Hero fields
     heroImage: z.string().optional(),
+    heroLayout: z.enum(["full","banner","aside","none"]).default("full").optional(),
+    heroAlt: z.string().optional(),
+    heroFocal: z.enum([
+      "center","top","bottom","left","right",
+      "top-left","top-right","bottom-left","bottom-right",
+    ]).default("center").optional(),
+    heroCaption: z.string().optional(),
+    heroCredit: z.string().optional(),
+    heroCreditUrl: z.string().optional(),
+
     tileImage: z.string().optional(),
     completed: z.string().optional(),
     featured: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
-    // Builder blocks
+
     content: z.array(contentBlock).default([]),
-    // Bottom-of-page sections (legacy/extra)
+
     files: z.array(fileRef).default([]),
     links: z.array(link).default([]),
   }),
