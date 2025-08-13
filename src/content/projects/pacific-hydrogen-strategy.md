@@ -46,7 +46,7 @@ files:
     file: /uploads/pacific-summary.pdf
 heroImage: /uploads/vanuatu3-2048x1536.jpg
 tileImage: /uploads/screenshot-2025-08-07-141022.png
-completed: 2024-12-01
+completed: ""
 featured: true
 tags:
   - Hydrogen
