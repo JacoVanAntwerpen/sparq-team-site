@@ -60,4 +60,3 @@ links:
   - label: pacificH2strategy Project Site
     url: https://pacifich2strategy.com/
 ---
-Optional extra details in Markdown can go here.
