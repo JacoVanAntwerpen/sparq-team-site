@@ -169,3 +169,46 @@ collections:
           - { label: "URL", name: "url", widget: "string" }
       - { label: "Citation", name: "citation", widget: "text", required: false }
       - { label: "Image", name: "image", widget: "image", required: false }
+
+  - name: team
+    label: Team
+    folder: src/content/team
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Prefix (e.g., Dr.)", name: "prefix", widget: "string", required: false }
+      - { label: "Role / Title", name: "role", widget: "string", required: false }
+      - { label: "Photo", name: "photo", widget: "image", required: false }
+      - { label: "Email", name: "email", widget: "string", required: false }
+      - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+      - { label: "Website", name: "website", widget: "string", required: false }
+      - { label: "Short bio (Markdown)", name: "body", widget: "markdown", required: false }
+      # Optional ordering field if you want to control grid order:
+      - { label: "Order", name: "order", widget: "number", required: false }
+
+  - name: publications
+    label: Publications
+    folder: src/content/publications
+    create: true
+    slug: "{{slug}}"
+    format: frontmatter
+    fields:
+      - { label: "Title", name: "title, widget: string" }
+      - label: "Authors"
+        name: "authors"
+        widget: "list"
+        required: false
+        field: { label: "Author", name: "author", widget: "string" }
+      - { label: "Year", name: "year", widget: "number" }
+      - { label: "Venue / Journal", name: "venue", widget: "string", required: false }
+      - { label: "DOI / URL", name: "url", widget: "string", required: false }
+      - { label: "Abstract (Markdown)", name: "body", widget: "markdown", required: false }
+      - label: "Files"
+        name: "files"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "File", name: "file", widget: "file" }

@@ -19,12 +19,32 @@ const fileRef = z.object({
 
 /** Content Builder blocks */
 const contentBlock = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("header"), text: z.string(), level: z.enum(["h2","h3","h4"]).default("h2") }),
-  z.object({ type: z.literal("subheader"), text: z.string(), level: z.enum(["h3","h4"]).default("h3") }),
+  z.object({
+    type: z.literal("header"),
+    text: z.string(),
+    level: z.enum(["h2", "h3", "h4"]).default("h2"),
+  }),
+  z.object({
+    type: z.literal("subheader"),
+    text: z.string(),
+    level: z.enum(["h3", "h4"]).default("h3"),
+  }),
   z.object({ type: z.literal("paragraph"), body: z.string() }), // markdown
-  z.object({ type: z.literal("list"), style: z.enum(["ul","ol"]).default("ul"), items: z.array(z.string()) }),
-  z.object({ type: z.literal("link"), label: z.string(), url: urlSchema }),
-  z.object({ type: z.literal("file"), label: z.string(), file: z.string() }),
+  z.object({
+    type: z.literal("list"),
+    style: z.enum(["ul", "ol"]).default("ul"),
+    items: z.array(z.string()),
+  }),
+  z.object({
+    type: z.literal("link"),
+    label: z.string(),
+    url: urlSchema,
+  }),
+  z.object({
+    type: z.literal("file"),
+    label: z.string(),
+    file: z.string(),
+  }),
 ]);
 
 const projects = defineCollection({
@@ -32,15 +52,29 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     shortDescription: z.string(),
-    longDetails: z.string().optional(),   // legacy fallback
+    longDetails: z.string().optional(), // legacy fallback
+
     // Hero fields
     heroImage: z.string().optional(),
-    heroLayout: z.enum(["full","banner","aside","none"]).default("full").optional(),
+    heroLayout: z
+      .enum(["full", "banner", "aside", "none"])
+      .default("full")
+      .optional(),
     heroAlt: z.string().optional(),
-    heroFocal: z.enum([
-      "center","top","bottom","left","right",
-      "top-left","top-right","bottom-left","bottom-right",
-    ]).default("center").optional(),
+    heroFocal: z
+      .enum([
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
+      ])
+      .default("center")
+      .optional(),
     heroCaption: z.string().optional(),
     heroCredit: z.string().optional(),
     heroCreditUrl: z.string().optional(),
@@ -60,18 +94,15 @@ const projects = defineCollection({
 const team = defineCollection({
   type: "content",
   schema: z.object({
-    prefix: z.string().optional(),
     name: z.string(),
-    title: z.string(),
-    shortSummary: z.string(),
-    longSummary: z.string().optional(),
+    prefix: z.string().optional(),
+    role: z.string().optional(),
+    photo: z.string().optional(),
     email: z.string().email().optional(),
     linkedin: z.string().url().optional(),
-    headshot: z.string().optional(),
-    linkedProjects: z.array(z.string()).default([]),
-    linkedPublications: z.array(z.string()).default([]),
+    website: z.string().url().optional(),
     order: z.number().optional(),
-    initials: z.string().optional(),
+    body: z.string().optional(), // markdown body
   }),
 });
 
@@ -79,12 +110,12 @@ const publications = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
-    heroImage: z.string().optional(),
-    abstract: z.string().optional(),
-    url: urlSchema,
-    authors: z.array(z.string()).default([]),
-    linkedProjects: z.array(z.string()).default([]),
+    authors: z.array(z.string()).optional(),
     year: z.number().optional(),
+    venue: z.string().optional(),
+    url: urlSchema.optional(),
+    files: z.array(fileRef).optional(),
+    body: z.string().optional(), // abstract or markdown body
   }),
 });
 
@@ -101,4 +132,4 @@ const resources = defineCollection({
   }),
 });
 
-export const collections = { team, projects, publications, resources };
+export const collections = { projects, team, publications, resources };
