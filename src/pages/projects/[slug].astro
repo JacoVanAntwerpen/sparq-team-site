@@ -10,203 +10,165 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content: BodyContent } = await entry.render();
+const { Content } = await entry.render();
 
-const renderMD = (md?: string) => (md ? marked.parse(md) : '');
+// Helpers
+const md = (s?: string) => (s ? marked.parse(s) : '');
 
-const heroUrl        = entry.data.heroImage as string | undefined;
-const heroAlt        = (entry.data.heroAlt as string | undefined) ?? '';
-const heroLayout     = (entry.data.heroLayout as string | undefined) ?? 'full';
-const heroFocal      = (entry.data.heroFocal as string | undefined) ?? 'center';
-const heroCaption    = entry.data.heroCaption as string | undefined;
-const heroCredit     = entry.data.heroCredit as string | undefined;
-const heroCreditUrl  = entry.data.heroCreditUrl as string | undefined;
+// Data from front-matter (all optional)
+const heroUrl       = entry.data.heroImage as string | undefined;
+const heroCredit    = entry.data.heroCredit as string | undefined;
+const heroCreditUrl = entry.data.heroCreditUrl as string | undefined;
 
-const objectPosition = (f: string) => {
-  switch (f) {
-    case 'top': return 'center top';
-    case 'bottom': return 'center bottom';
-    case 'left': return 'left center';
-    case 'right': return 'right center';
-    case 'top-left': return 'left top';
-    case 'top-right': return 'right top';
-    case 'bottom-left': return 'left bottom';
-    case 'bottom-right': return 'right bottom';
-    default: return 'center';
-  }
-};
+// Layout selection with sensible default
+type HeroLayout = 'standard' | 'aside' | 'wide' | 'banner' | 'none';
+const heroLayout: HeroLayout =
+  (entry.data.heroLayout as HeroLayout | undefined) ??
+  (heroUrl ? 'standard' : 'none');
 
-// Build style strings OUTSIDE of attribute expressions to avoid parser hiccups
-const heroObjPosStyle = `object-position: ${objectPosition(heroFocal)};`;
-const bannerAspectStyle = 'aspect-ratio: 21/9;';
-const asideAspectStyle  = 'aspect-ratio: 3/4;';
+// Optional long details (markdown string in front-matter)
+const longDetails   = entry.data.longDetails as string | undefined;
 
-const Blocks = (
-  entry.data.content && entry.data.content.length > 0
-    ? entry.data.content.map((block: any) => (
-        (() => {
-          switch (block.type) {
-            case 'header':
-              return block.level === 'h3' ? <h3>{block.text}</h3>
-                   : block.level === 'h4' ? <h4>{block.text}</h4>
-                   : <h2>{block.text}</h2>;
-            case 'subheader':
-              return block.level === 'h4' ? <h4>{block.text}</h4> : <h3>{block.text}</h3>;
-            case 'paragraph':
-              return <div set:html={renderMD(block.body)} />;
-            case 'list': {
-              const items = (block.items ?? []).map((it: string) => <li>{it}</li>);
-              return block.style === 'ol'
-                ? <ol class="list-decimal pl-6">{items}</ol>
-                : <ul class="list-disc pl-6">{items}</ul>;
-            }
-            case 'link':
-              return <p><a class="text-blue-700" href={block.url}>{block.label}</a></p>;
-            case 'file':
-              return <p><a class="text-blue-700" href={block.file} download>{block.label}</a></p>;
-            default:
-              return null;
-          }
-        })()
-      ))
-    : (entry.data.longDetails
-        ? <div set:html={renderMD(entry.data.longDetails)} />
-        : <BodyContent />)
-);
+// Optional arrays
+const links = (entry.data.links ?? []) as Array<{ label: string; url: string }>;
+const files = (entry.data.files ?? []) as Array<{ label: string; file: string }>;
 ---
 
-{/* BANNER layout (image above title) */}
-{heroUrl && heroLayout === 'banner' && (
-  <div class="w-full mb-8">
-    <div class="relative w-full overflow-hidden border rounded-xl" style={bannerAspectStyle}>
-      <img
-        src={heroUrl}
-        alt={heroAlt}
-        class="h-full w-full object-cover"
-        style={heroObjPosStyle}
-      />
-      <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/20 to-transparent"></div>
-    </div>
-    {(heroCaption || heroCredit) && (
-      <p class="mt-2 text-sm text-gray-500">
-        {heroCaption}
-        {heroCredit && (
-          <span>
-            {' '}— Photo:{' '}
-            {heroCreditUrl ? <a class="underline" href={heroCreditUrl}>{heroCredit}</a> : heroCredit}
-          </span>
-        )}
-      </p>
-    )}
-  </div>
-)}
+<BaseLayout
+  title={`${entry.data.title} — SPARQ Projects`}
+  description={entry.data.shortDescription}
+>
+  <Section id="project" title={entry.data.title} subtitle={entry.data.shortDescription}>
 
-<BaseLayout title={`${entry.data.title} — SPARQ Projects`}>
-  {/* ASIDE layout (portrait image to the right on large screens) */}
-  {heroUrl && heroLayout === 'aside' ? (
-    <Section>
-      <div class="lg:grid lg:grid-cols-12 lg:gap-8">
-        <div class="lg:col-span-8">
-          <h1 class="text-3xl font-semibold tracking-tight mb-2">{entry.data.title}</h1>
-          {entry.data.completed && <p class="text-gray-500 mb-6">Completed: {entry.data.completed}</p>}
-          <div class="prose max-w-none">
-            {Blocks}
-          </div>
-          {entry.data.links?.length > 0 && (
-            <div class="mt-8">
-              <h3 class="font-semibold mb-2">Related links</h3>
-              <ul class="list-disc pl-5">
-                {entry.data.links.map((l: any) => (
-                  <li><a class="text-blue-700" href={l.url}>{l.label}</a></li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {entry.data.files?.length > 0 && (
-            <div class="mt-8">
-              <h3 class="font-semibold mb-2">Downloads</h3>
-              <ul class="list-disc pl-5">
-                {entry.data.files.map((f: any) => (
-                  <li><a class="text-blue-700" href={f.file} download>{f.label}</a></li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-        <aside class="lg:col-span-4 mt-6 lg:mt-0">
-          <div class="lg:sticky lg:top-24">
-            <div class="overflow-hidden border rounded-xl" style={asideAspectStyle}>
-              <img
-                src={heroUrl}
-                alt={heroAlt}
-                class="h-full w-full object-cover"
-                style={heroObjPosStyle}
-              />
-            </div>
-            {(heroCaption || heroCredit) && (
-              <p class="mt-2 text-sm text-gray-500">
-                {heroCaption}
-                {heroCredit && (
-                  <span>
-                    {' '}— Photo:{' '}
-                    {heroCreditUrl ? <a class="underline" href={heroCreditUrl}>{heroCredit}</a> : heroCredit}
-                  </span>
+    {/* HERO — preset layouts */}
+    {heroUrl && heroLayout !== 'none' && (
+      <>
+        {/* STANDARD: full-width within content container */}
+        {heroLayout === 'standard' && (
+          <figure class="mb-8">
+            <img src={heroUrl} alt={entry.data.title} class="w-full rounded-2xl shadow-sm" loading="eager" />
+            {(heroCredit || heroCreditUrl) && (
+              <figcaption class="mt-2 text-sm text-neutral-600">
+                Photo:{' '}
+                {heroCreditUrl ? (
+                  <a class="underline" href={heroCreditUrl} target="_blank" rel="noopener noreferrer">
+                    {heroCredit ?? heroCreditUrl}
+                  </a>
+                ) : (
+                  heroCredit
                 )}
-              </p>
+              </figcaption>
+            )}
+          </figure>
+        )}
+
+        {/* ASIDE: image floats right on large screens */}
+        {heroLayout === 'aside' && (
+          <figure class="mb-8 lg:float-right lg:w-1/2 lg:ml-8 lg:mb-4">
+            <img src={heroUrl} alt={entry.data.title} class="w-full rounded-2xl shadow-sm" loading="eager" />
+            {(heroCredit || heroCreditUrl) && (
+              <figcaption class="mt-2 text-sm text-neutral-600">
+                Photo:{' '}
+                {heroCreditUrl ? (
+                  <a class="underline" href={heroCreditUrl} target="_blank" rel="noopener noreferrer">
+                    {heroCredit ?? heroCreditUrl}
+                  </a>
+                ) : (
+                  heroCredit
+                )}
+              </figcaption>
+            )}
+          </figure>
+        )}
+
+        {/* WIDE: bleed to container edges */}
+        {heroLayout === 'wide' && (
+          <div class="-mx-4 sm:-mx-6 lg:-mx-24 mb-8">
+            <img
+              src={heroUrl}
+              alt={entry.data.title}
+              class="w-full max-h-[70vh] object-cover"
+              loading="eager"
+            />
+            {(heroCredit || heroCreditUrl) && (
+              <div class="mt-2 px-4 sm:px-6 lg:px-24 text-sm text-neutral-600">
+                Photo:{' '}
+                {heroCreditUrl ? (
+                  <a class="underline" href={heroCreditUrl} target="_blank" rel="noopener noreferrer">
+                    {heroCredit ?? heroCreditUrl}
+                  </a>
+                ) : (
+                  heroCredit
+                )}
+              </div>
             )}
           </div>
-        </aside>
+        )}
+
+        {/* BANNER: tall hero within container */}
+        {heroLayout === 'banner' && (
+          <figure class="mb-8">
+            <div class="w-full h-[40vh] md:h-[50vh] lg:h-[60vh] overflow-hidden rounded-2xl shadow-sm">
+              <img src={heroUrl} alt={entry.data.title} class="w-full h-full object-cover" loading="eager" />
+            </div>
+            {(heroCredit || heroCreditUrl) && (
+              <figcaption class="mt-2 text-sm text-neutral-600">
+                Photo:{' '}
+                {heroCreditUrl ? (
+                  <a class="underline" href={heroCreditUrl} target="_blank" rel="noopener noreferrer">
+                    {heroCredit ?? heroCreditUrl}
+                  </a>
+                ) : (
+                  heroCredit
+                )}
+              </figcaption>
+            )}
+          </figure>
+        )}
+      </>
+    )}
+
+    {/* Optional long details from front-matter (markdown string) */}
+    {longDetails && (
+      <div class="prose prose-neutral max-w-none" set:html={md(longDetails)}></div>
+    )}
+
+    {/* Markdown body from the .md/.mdx entry */}
+    <article class="prose prose-neutral max-w-none mt-6">
+      <Content />
+    </article>
+
+    {/* Clear float from "aside" layout */}
+    {heroLayout === 'aside' && <div class="clear-both"></div>}
+
+    {links.length > 0 && (
+      <div class="mt-8">
+        <h3 class="font-semibold mb-2">Links</h3>
+        <ul class="list-disc pl-5">
+          {links.map((l) => (
+            <li>
+              <a class="text-blue-700 underline" href={l.url} target="_blank" rel="noopener noreferrer">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
-    </Section>
-  ) : (
-    // FULL or NONE (default Section heading block)
-    <Section
-      title={entry.data.title}
-      subtitle={entry.data.completed ? `Completed: ${entry.data.completed}` : undefined}
-    >
-      {/* FULL layout: large image under title */}
-      {heroUrl && heroLayout === 'full' && (
-        <>
-          <img src={heroUrl} alt={heroAlt} class="mb-6 rounded-xl border w-full h-auto" />
-          {(heroCaption || heroCredit) && (
-            <p class="mt-[-0.5rem] mb-4 text-sm text-gray-500">
-              {heroCaption}
-              {heroCredit && (
-                <span>
-                  {' '}— Photo:{' '}
-                  {heroCreditUrl ? <a class="underline" href={heroCreditUrl}>{heroCredit}</a> : heroCredit}
-                </span>
-              )}
-            </p>
-          )}
-        </>
-      )}
+    )}
 
-      <div class="prose max-w-none">
-        {Blocks}
+    {files.length > 0 && (
+      <div class="mt-8">
+        <h3 class="font-semibold mb-2">Downloads</h3>
+        <ul class="list-disc pl-5">
+          {files.map((f) => (
+            <li>
+              <a class="text-blue-700 underline" href={f.file} download>
+                {f.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
-
-      {entry.data.links?.length > 0 && (
-        <div class="mt-8">
-          <h3 class="font-semibold mb-2">Related links</h3>
-          <ul class="list-disc pl-5">
-            {entry.data.links.map((l: any) => (
-              <li><a class="text-blue-700" href={l.url}>{l.label}</a></li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {entry.data.files?.length > 0 && (
-        <div class="mt-8">
-          <h3 class="font-semibold mb-2">Downloads</h3>
-          <ul class="list-disc pl-5">
-            {entry.data.files.map((f: any) => (
-              <li><a class="text-blue-700" href={f.file} download>{f.label}</a></li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </Section>
-  )}
+    )}
+  </Section>
 </BaseLayout>
