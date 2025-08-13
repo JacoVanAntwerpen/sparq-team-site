@@ -1,28 +1,75 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import { marked } from 'marked';
 
 export async function getStaticPaths() {
   const entries = await getCollection('projects');
   return entries.map((e) => ({ params: { slug: e.slug }, props: { entry: e } }));
 }
+
 const { entry } = Astro.props;
+
+const renderMD = (md?: string) => (md ? marked.parse(md) : '');
 ---
+
 <BaseLayout title={`${entry.data.title} — SPARQ Projects`}>
   <Section title={entry.data.title} subtitle={entry.data.completed ? `Completed: ${entry.data.completed}` : undefined}>
     {entry.data.heroImage && <img src={entry.data.heroImage} alt="" class="mb-6 rounded-xl border" />}
+
     <div class="prose max-w-none">
-      <p>{entry.data.longDetails ?? entry.body}</p>
+      {
+        entry.data.content && entry.data.content.length > 0
+          ? entry.data.content.map((block) => (
+              block.type === 'header' && (
+                block.level === 'h2' ? <h2>{block.text}</h2>
+                  : block.level === 'h3' ? <h3>{block.text}</h3>
+                  : <h4>{block.text}</h4>
+              )
+            ) || (
+              block.type === 'subheader' && (
+                block.level === 'h3' ? <h3>{block.text}</h3> : <h4>{block.text}</h4>
+              )
+            ) || (
+              block.type === 'paragraph' && (
+                <div set:html={renderMD(block.body)} />
+              )
+            ) || (
+              block.type === 'list' && (
+                block.style === 'ol'
+                  ? <ol class="list-decimal pl-6">{block.items.map((it) => <li>{it}</li>)}</ol>
+                  : <ul class="list-disc pl-6">{block.items.map((it) => <li>{it}</li>)}</ul>
+              )
+            ) || (
+              block.type === 'link' && (
+                <p><a class="text-blue-700" href={block.url}>{block.label}</a></p>
+              )
+            ) || (
+              block.type === 'file' && (
+                <p><a class="text-blue-700" href={block.file} download>{block.label}</a></p>
+              )
+            )
+          ))
+          : (
+            // Fallbacks: prefer longDetails (markdown), else page body markdown
+            entry.data.longDetails
+              ? <div set:html={renderMD(entry.data.longDetails)} />
+              : (await render(entry)).Content
+          )
+      }
     </div>
+
+    {/* Legacy/extra sections still supported */}
     {entry.data.links?.length > 0 && (
       <div class="mt-8">
-        <h3 class="font-semibold mb-2">Links</h3>
+        <h3 class="font-semibold mb-2">Related links</h3>
         <ul class="list-disc pl-5">
           {entry.data.links.map(l => (<li><a class="text-blue-700" href={l.url}>{l.label}</a></li>))}
         </ul>
       </div>
     )}
+
     {entry.data.files?.length > 0 && (
       <div class="mt-8">
         <h3 class="font-semibold mb-2">Downloads</h3>

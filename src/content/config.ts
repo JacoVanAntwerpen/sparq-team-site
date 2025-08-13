@@ -1,11 +1,11 @@
 // src/content/config.ts
 import { defineCollection, z } from "astro:content";
 
-// Accept absolute URLs, site-relative paths, or anchors
+/** URLs can be absolute, site-relative, or anchors */
 const urlSchema = z.union([
-  z.string().url(),            // https://example.com
-  z.string().startsWith("/"),  // /relative/path
-  z.string().startsWith("#"),  // #anchor
+  z.string().url(),
+  z.string().startsWith("/"),
+  z.string().startsWith("#"),
 ]);
 
 const link = z.object({
@@ -15,66 +15,111 @@ const link = z.object({
 
 const fileRef = z.object({
   label: z.string(),
-  file: z.string(), // path in /public/uploads or absolute
+  file: z.string(),
 });
 
-// TEAM
-const team = defineCollection({
-  type: "content",
-  schema: z.object({
-    prefix: z.string().optional(), // Dr., Prof., etc.
-    name: z.string(),
-    title: z.string(), // job title / role
-    shortSummary: z.string().max(200),
-    longSummary: z.string().optional(), // can also use body markdown
-    email: z.string().email().optional(),
-    linkedin: urlSchema.optional(),
-    headshot: z.string().optional(), // /uploads/<file>
-    linkedProjects: z.array(z.string()).default([]), // slugs of projects
-    linkedPublications: z.array(z.string()).default([]), // slugs of publications
-    order: z.number().default(999),
-    initials: z.string().optional(), // fallback avatar
-  }),
+/** Content Builder blocks (typed / discriminated) */
+const headerBlock = z.object({
+  type: z.literal("header"),
+  text: z.string(),
+  level: z.enum(["h2", "h3", "h4"]).default("h2"),
 });
 
-// PROJECTS
+const subheaderBlock = z.object({
+  type: z.literal("subheader"),
+  text: z.string(),
+  level: z.enum(["h3", "h4"]).default("h3"),
+});
+
+const paragraphBlock = z.object({
+  type: z.literal("paragraph"),
+  body: z.string(), // markdown allowed
+});
+
+const listBlock = z.object({
+  type: z.literal("list"),
+  style: z.enum(["ul", "ol"]).default("ul"),
+  items: z.array(z.string()),
+});
+
+const linkBlock = z.object({
+  type: z.literal("link"),
+  label: z.string(),
+  url: urlSchema,
+});
+
+const fileBlock = z.object({
+  type: z.literal("file"),
+  label: z.string(),
+  file: z.string(),
+});
+
+const contentBlock = z.discriminatedUnion("type", [
+  headerBlock,
+  subheaderBlock,
+  paragraphBlock,
+  listBlock,
+  linkBlock,
+  fileBlock,
+]);
+
+/** Collections */
 const projects = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
-    shortDescription: z.string().max(240),
-    longDetails: z.string().optional(), // can also use body markdown
-    links: z.array(link).default([]),
-    files: z.array(fileRef).default([]),
+    shortDescription: z.string(),
+    longDetails: z.string().optional(), // legacy fallback
     heroImage: z.string().optional(),
     tileImage: z.string().optional(),
-    completed: z.string().optional(), // ISO date (YYYY-MM-DD)
+    completed: z.string().optional(),
     featured: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
+    // Builder blocks
+    content: z.array(contentBlock).default([]),
+    // Bottom-of-page sections (legacy/extra)
+    files: z.array(fileRef).default([]),
+    links: z.array(link).default([]),
   }),
 });
 
-// PUBLICATIONS
+const team = defineCollection({
+  type: "content",
+  schema: z.object({
+    prefix: z.string().optional(),
+    name: z.string(),
+    title: z.string(),
+    shortSummary: z.string(),
+    longSummary: z.string().optional(),
+    email: z.string().email().optional(),
+    linkedin: z.string().url().optional(),
+    headshot: z.string().optional(),
+    linkedProjects: z.array(z.string()).default([]),
+    linkedPublications: z.array(z.string()).default([]),
+    order: z.number().optional(),
+    initials: z.string().optional(),
+  }),
+});
+
 const publications = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     heroImage: z.string().optional(),
-    abstract: z.string().optional(), // or body
-    url: urlSchema, // usually absolute, but allow relative if needed
+    abstract: z.string().optional(),
+    url: urlSchema,
     authors: z.array(z.string()).default([]),
     linkedProjects: z.array(z.string()).default([]),
     year: z.number().optional(),
   }),
 });
 
-// RESOURCES (tools & resources)
 const resources = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     oneLine: z.string(),
-    summary: z.string().optional(), // or body
+    summary: z.string().optional(),
     files: z.array(fileRef).default([]),
     links: z.array(link).default([]),
     citation: z.string().optional(),
