@@ -2,74 +2,102 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "public/uploads"
-public_folder: "/uploads"
+media_folder: public/uploads
+public_folder: /uploads
 
 collections:
-  - name: "projects"
-    label: "Projects"
-    folder: "src/content/projects"
+  - name: projects
+    label: Projects
+    folder: src/content/projects
     create: true
     slug: "{{slug}}"
-    format: "frontmatter"
+    format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Short description", name: "shortDescription", widget: "text" }
       - { label: "Long details", name: "longDetails", widget: "text", required: false }
-      - { label: "Links", name: "links", widget: "list", required: false, fields: [{label: "Label", name: "label", widget: "string"}, {label: "URL", name: "url", widget: "string"}] }
-      - { label: "Files", name: "files", widget: "list", required: false, fields: [{label: "Label", name: "label", widget: "string"}, {label: "File", name: "file", widget: "file"}] }
+      - label: "Links"
+        name: "links"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "URL", name: "url", widget: "string" }
+      - label: "Files"
+        name: "files"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "File", name: "file", widget: "file" }
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - { label: "Tile image", name: "tileImage", widget: "image", required: false }
       - { label: "Completion date", name: "completed", widget: "datetime", required: false, format: "YYYY-MM-DD" }
       - { label: "Featured", name: "featured", widget: "boolean", default: false }
-      - { label: "Tags", name: "tags", widget: "list", required: false, field: {label: "Tag", name: "tag", widget: "string"} }
+      # FIX: tags must be a list of strings (not list of objects)
+      - { label: "Tags", name: "tags", widget: "list", required: false }
 
-  - name: "team"
-    label: "Team"
-    folder: "src/content/team"
+  - name: team
+    label: Team
+    folder: src/content/team
     create: true
     slug: "{{slug}}"
-    format: "frontmatter"
+    format: frontmatter
     fields:
       - { label: "Prefix", name: "prefix", widget: "string", required: false }
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Short summary", name: "shortSummary", widget: "text" }
       - { label: "Long summary", name: "longSummary", widget: "text", required: false }
-      - { label: "Email", name: "email", widget: "string", required: false }
-      - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false }
+      - { label: "Email", name: "email", widget: "string", required: false, pattern: ["^\\S+@\\S+\\.\\S+$", "Enter a valid email"] }
+      - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false, pattern: ["^https?://", "Must start with http(s)"] }
       - { label: "Headshot", name: "headshot", widget: "image", required: false }
-      - { label: "Linked projects (slugs)", name: "linkedProjects", widget: "list", required: false, field: {label: "Project slug", name: "slug", widget: "string"} }
-      - { label: "Linked publications (slugs)", name: "linkedPublications", widget: "list", required: false, field: {label: "Publication slug", name: "slug", widget: "string"} }
+      # FIX: linkedProjects/linkedPublications must be lists of strings (slugs)
+      - { label: "Linked projects (slugs)", name: "linkedProjects", widget: "list", required: false }
+      - { label: "Linked publications (slugs)", name: "linkedPublications", widget: "list", required: false }
       - { label: "Order", name: "order", widget: "number", required: false, default: 999 }
       - { label: "Initials", name: "initials", widget: "string", required: false }
 
-  - name: "publications"
-    label: "Publications"
-    folder: "src/content/publications"
+  - name: publications
+    label: Publications
+    folder: src/content/publications
     create: true
     slug: "{{slug}}"
-    format: "frontmatter"
+    format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - { label: "Abstract", name: "abstract", widget: "text", required: false }
       - { label: "URL", name: "url", widget: "string" }
-      - { label: "Authors", name: "authors", widget: "list", field: {label: "Author", name: "name", widget: "string"} }
-      - { label: "Linked projects (slugs)", name: "linkedProjects", widget: "list", required: false, field: {label: "Project slug", name: "slug", widget: "string"} }
+      # FIX: authors must be a list of strings
+      - { label: "Authors", name: "authors", widget: "list" }
+      # FIX: linkedProjects must be a list of strings (slugs)
+      - { label: "Linked projects (slugs)", name: "linkedProjects", widget: "list", required: false }
       - { label: "Year", name: "year", widget: "number", required: false }
 
-  - name: "resources"
+  - name: resources
     label: "Tools & Resources"
-    folder: "src/content/resources"
+    folder: src/content/resources
     create: true
     slug: "{{slug}}"
-    format: "frontmatter"
+    format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "One-line description", name: "oneLine", widget: "string" }
       - { label: "Summary", name: "summary", widget: "text", required: false }
-      - { label: "Files", name: "files", widget: "list", required: false, fields: [{label: "Label", name: "label", widget: "string"}, {label: "File", name: "file", widget: "file"}] }
-      - { label: "Links", name: "links", widget: "list", required: false, fields: [{label: "Label", name: "label", widget: "string"}, {label: "URL", name: "url", widget: "string"}] }
+      - label: "Files"
+        name: "files"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "File", name: "file", widget: "file" }
+      - label: "Links"
+        name: "links"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "URL", name: "url", widget: "string" }
       - { label: "Citation", name: "citation", widget: "text", required: false }
       - { label: "Image", name: "image", widget: "image", required: false }
