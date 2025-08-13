@@ -15,6 +15,8 @@
       html,body{height:100%}
       body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
       .auth-wrap{position:fixed;inset:0;display:grid;place-items:center;background:transparent;z-index:10}
+      /* 🔧 Hide the overlay when aria-hidden="true" */
+      .auth-wrap[aria-hidden="true"]{display:none !important}
       .auth-card{border:1px solid var(--border);border-radius:14px;padding:20px 24px;background:#fff;box-shadow:0 10px 25px rgba(0,0,0,.06);width:360px;max-width:90vw}
       .brand{font-weight:700;font-size:20px;margin:0 0 6px}
       .muted{color:var(--muted);font-size:14px;margin:0 0 16px}
@@ -51,6 +53,11 @@
       const showAuth = ()=> auth?.setAttribute('aria-hidden','false');
       const hideAuth = ()=> auth?.setAttribute('aria-hidden','true');
 
+      function forceHideOverlay(){
+        hideAuth();
+        if (auth) auth.style.display = 'none'; // extra safety
+      }
+
       function getTokenParam(){
         const url = new URL(window.location.href);
         const token = url.searchParams.get('token');
@@ -69,8 +76,8 @@
       }
 
       // Wire buttons
-      loginBtn.addEventListener('click', () => { hideAuth(); window.netlifyIdentity.open('login'); });
-      signupBtn.addEventListener('click', () => { hideAuth(); window.netlifyIdentity.open('signup'); });
+      loginBtn.addEventListener('click', () => { forceHideOverlay(); window.netlifyIdentity.open('login'); });
+      signupBtn.addEventListener('click', () => { forceHideOverlay(); window.netlifyIdentity.open('signup'); });
       logoutBtn.addEventListener('click', () => { window.netlifyIdentity?.logout(); });
 
       // Initialize Identity and CMS
@@ -84,7 +91,7 @@
         window.netlifyIdentity.on('init', user => {
           if (user) {
             setStatus(`Logged in as ${user.email||'user'}`);
-            hideAuth();
+            forceHideOverlay(); // ensure overlay is hidden if already logged in
             initCMSWhenReady();
           } else {
             showAuth();
@@ -95,22 +102,27 @@
         const tok = getTokenParam();
         if (tok) {
           setStatus('Processing invite/confirmation…');
-          hideAuth();
+          forceHideOverlay();
           const p = tok.kind === 'invite_token'
             ? window.netlifyIdentity.acceptInvite(tok.value, true)
             : window.netlifyIdentity.confirm(tok.value, true);
           Promise.resolve(p)
-            .then(() => { setStatus('Verified. Loading admin…'); hideAuth(); cleanURL(); })
-            .catch(() => { setStatus('Token detected. Complete in the dialog.'); hideAuth(); window.netlifyIdentity.open(tok.kind === 'invite_token' ? 'signup' : 'login'); });
+            .then(() => { setStatus('Verified. Loading admin…'); forceHideOverlay(); cleanURL(); })
+            .catch(() => { setStatus('Token detected. Complete in the dialog.'); forceHideOverlay(); window.netlifyIdentity.open(tok.kind === 'invite_token' ? 'signup' : 'login'); });
         }
 
         window.netlifyIdentity.on('login', (user) => {
           setStatus(`Logged in as ${user.email||'user'}`);
-          hideAuth();
+          forceHideOverlay(); // 🔧 actually hide/remove overlay after login
           cleanURL();
           initCMSWhenReady();
         });
-        window.netlifyIdentity.on('logout', () => { setStatus('Logged out'); showAuth(); });
+
+        window.netlifyIdentity.on('logout', () => {
+          setStatus('Logged out');
+          if (auth) auth.style.display = ''; // allow overlay to show again
+          showAuth();
+        });
 
         // Keep logout button state in sync
         setInterval(() => {
