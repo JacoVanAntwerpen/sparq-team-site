@@ -39,6 +39,8 @@ longDetails: >-
 
   Accelerate progress toward decarbonisation, energy security, and alignment with global net-zero goals.
 heroImage: /uploads/vanuatu3-2048x1536.jpg
+heroLayout: banner
+heroFocal: center
 tileImage: /uploads/screenshot-2025-08-07-141022.png
 completed: ""
 featured: true
