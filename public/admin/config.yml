@@ -10,16 +10,15 @@ collections:
     label: Projects
     folder: src/content/projects
     create: true
+    # leave default file slug from title
     slug: "{{slug}}"
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "One-line description", name: "shortDescription", widget: "string" }
 
-      # Optional markdown body if you don't use builder
       - { label: "Long details (markdown fallback)", name: "longDetails", widget: "markdown", required: false }
 
-      # Content Builder (typed / orderable blocks)
       - label: "Content Builder"
         name: "content"
         widget: "list"
@@ -65,7 +64,6 @@ collections:
                 widget: "list"
                 field: { label: "Item", name: "item", widget: "string" }
 
-      # Media for tiles & hero
       - { label: "Tile image (for cards)", name: "tileImage", widget: "image", required: false }
       - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
@@ -78,6 +76,7 @@ collections:
           - { label: "Wide (edge-to-edge within container)", value: "wide" }
           - { label: "Full-bleed (edge of page)", value: "edge" }
           - { label: "None", value: "none" }
+          - { label: "Aside (float right)", value: "aside" }
       - label: "Hero focal point"
         name: "heroFocalPoint"
         widget: "select"
@@ -128,13 +127,10 @@ collections:
     label: Team
     folder: src/content/team
     create: true
-    identifier_field: slug
-    slug: "{{fields.slug}}"
+    # make filename/URL from name
+    slug: "{{name}}"
     format: frontmatter
     fields:
-      - { label: "Slug (URL part)", name: "slug", widget: "string",
-          hint: "Lowercase, a-z, 0-9, hyphens only. Example: jaco-van-antwerpen",
-          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
       - { label: "Prefix (e.g., Dr.)", name: "prefix", widget: "string", required: false }
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Role / Title", name: "role", widget: "string", required: false }
@@ -167,13 +163,11 @@ collections:
     label: Publications
     folder: src/content/publications
     create: true
-    slug: "{{fields.slug}}"
-    identifier_field: slug
+    # use year + title for stable URLs
+    slug: "{{year}}-{{title}}"
     format: frontmatter
     fields:
-      - { label: "Slug (URL part)", name: "slug", widget: "string",
-          hint: "Lowercase, a-z, 0-9, hyphens only. Example: dai-2024-dynamic-tea",
-          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
+      # (no 'slug' field)
       - { label: "Title", name: "title", widget: "string" }
       - label: "Authors"
         name: "authors"
@@ -205,13 +199,9 @@ collections:
     label: Tools & Resources
     folder: src/content/resources
     create: true
-    slug: "{{fields.slug}}"
-    identifier_field: slug
+    slug: "{{title}}"
     format: frontmatter
     fields:
-      - { label: "Slug (URL part)", name: "slug", widget: "string",
-          hint: "Lowercase, a-z, 0-9, hyphens only. Example: dynamic-tea-tool",
-          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
       - { label: "Title", name: "title", widget: "string" }
       - { label: "One-line description", name: "oneLine", widget: "string" }
       - { label: "Summary (Markdown)", name: "summary", widget: "markdown", required: false }
@@ -236,13 +226,9 @@ collections:
     label: Partners & Collaborators
     folder: src/content/partners
     create: true
-    slug: "{{fields.slug}}"
-    identifier_field: slug
+    slug: "{{name}}"
     format: frontmatter
     fields:
-      - { label: "Slug (URL part)", name: "slug", widget: "string",
-          hint: "Lowercase, a-z, 0-9, hyphens only. Example: unsw",
-          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Logo", name: "logo", widget: "image" }
       - { label: "Website", name: "url", widget: "string", required: false }
@@ -252,13 +238,9 @@ collections:
     label: General Images
     folder: src/content/media
     create: true
-    slug: "{{fields.slug}}"
-    identifier_field: slug
+    slug: "{{title}}"
     format: frontmatter
     fields:
-      - { label: "Slug (URL part)", name: "slug", widget: "string",
-          hint: "Lowercase, a-z, 0-9, hyphens only. Example: green-ammonia-hero",
-          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Image", name: "image", widget: "image" }
       - { label: "Alt text", name: "alt", widget: "string", required: false }
