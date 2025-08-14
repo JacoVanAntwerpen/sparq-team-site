@@ -1,8 +1,16 @@
 ---
-import { COLLABORATORS } from '@data/collaborators';
+import { getCollection } from 'astro:content';
+const partners = (await getCollection('partners'))
+  .sort((a,b) => (a.data.order ?? 9999) - (b.data.order ?? 9999));
 ---
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 items-center">
-  {COLLABORATORS.map(c => (
-    <div class="flex items-center justify-center rounded-xl border border-neutral-200 bg-white h-16 text-neutral-600 font-semibold">{c}</div>
+  {partners.map((p) => (
+    <a href={p.data.url || '#'} target={p.data.url ? '_blank' : undefined} class="flex items-center justify-center rounded-xl border border-neutral-200 bg-white h-16">
+      {p.data.logo ? (
+        <img src={p.data.logo} alt={p.data.name} class="max-h-10 object-contain" loading="lazy" />
+      ) : (
+        <span class="text-neutral-600 font-semibold">{p.data.name}</span>
+      )}
+    </a>
   ))}
 </div>

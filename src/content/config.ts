@@ -17,84 +17,43 @@ const fileRef = z.object({
   file: z.string(),
 });
 
-/** Content Builder blocks */
-const contentBlock = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("header"),
-    text: z.string(),
-    level: z.enum(["h2", "h3", "h4"]).default("h2"),
-  }),
-  z.object({
-    type: z.literal("subheader"),
-    text: z.string(),
-    level: z.enum(["h3", "h4"]).default("h3"),
-  }),
-  z.object({ type: z.literal("paragraph"), body: z.string() }), // markdown
-  z.object({
-    type: z.literal("list"),
-    style: z.enum(["ul", "ol"]).default("ul"),
-    items: z.array(z.string()),
-  }),
-  z.object({
-    type: z.literal("link"),
-    label: z.string(),
-    url: urlSchema,
-  }),
-  z.object({
-    type: z.literal("file"),
-    label: z.string(),
-    file: z.string(),
-  }),
-]);
-
 const projects = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     shortDescription: z.string(),
-    longDetails: z.string().optional(), // legacy fallback
+    longDetails: z.string().optional(), // optional markdown fallback
+    content: z.any().optional(),        // content builder (kept for compatibility)
+    featured: z.boolean().default(false),
 
-    // Hero fields
+    // Tile image for cards
+    tileImage: z.string().optional(),
+    tileImageAlt: z.string().optional(),
+
+    // Hero configuration for detail page
     heroImage: z.string().optional(),
-    heroLayout: z
-      .enum(["full", "banner", "aside", "none"])
-      .default("full")
-      .optional(),
-    heroAlt: z.string().optional(),
-    heroFocal: z
-      .enum([
-        "center",
-        "top",
-        "bottom",
-        "left",
-        "right",
-        "top-left",
-        "top-right",
-        "bottom-left",
-        "bottom-right",
-      ])
-      .default("center")
-      .optional(),
+    heroLayout: z.enum(["standard","wide","edge","none"]).default("standard"),
+    heroFocalPoint: z.enum([
+      "center","top","bottom","left","right",
+      "top-left","top-right","bottom-left","bottom-right"
+    ]).default("center"),
     heroCaption: z.string().optional(),
     heroCredit: z.string().optional(),
     heroCreditUrl: z.string().optional(),
 
-    tileImage: z.string().optional(),
-    completed: z.string().optional(),
-    featured: z.boolean().default(false),
-    tags: z.array(z.string()).default([]),
-
-    content: z.array(contentBlock).default([]),
-
+    // Attachments and external links
     files: z.array(fileRef).default([]),
     links: z.array(link).default([]),
+
+    // Partner relationships (by slug)
+    partners: z.array(z.string()).default([]),
   }),
 });
 
 const team = defineCollection({
   type: "content",
   schema: z.object({
-    slug: z.string().optional(),         // <— allow custom slug
+    slug: z.string().optional(),         // allow custom slug
     prefix: z.string().optional(),
     name: z.string(),
     role: z.string().optional(),
@@ -103,29 +62,34 @@ const team = defineCollection({
     linkedin: z.string().url().optional(),
     website: z.string().url().optional(),
     order: z.number().optional(),
+    linkedProjects: z.array(z.string()).default([]),
+    linkedPublications: z.array(z.string()).default([]),
     body: z.string().optional(),
     title: z.string().optional(),        // compatibility if you used `title`
   }),
 });
 
-
-
 const publications = defineCollection({
   type: "content",
   schema: z.object({
+    slug: z.string().optional(),
     title: z.string(),
-    authors: z.array(z.string()).optional(),
-    year: z.number().optional(),
+    authors: z.array(z.string()).default([]),
+    year: z.number(),
     venue: z.string().optional(),
-    url: urlSchema.optional(),
-    files: z.array(fileRef).optional(),
-    body: z.string().optional(), // abstract or markdown body
+    doi: z.string().url().optional(),
+    url: z.string().url().optional(), // legacy / external landing
+    abstract: z.string().optional(),
+    heroImage: z.string().optional(),
+    links: z.array(link).default([]),
+    files: z.array(fileRef).default([]),
   }),
 });
 
 const resources = defineCollection({
   type: "content",
   schema: z.object({
+    slug: z.string().optional(),
     title: z.string(),
     oneLine: z.string(),
     summary: z.string().optional(),
@@ -136,4 +100,27 @@ const resources = defineCollection({
   }),
 });
 
-export const collections = { projects, team, publications, resources };
+const partners = defineCollection({
+  type: "content",
+  schema: z.object({
+    slug: z.string(),
+    name: z.string(),
+    logo: z.string(),           // /uploads/...
+    url: z.string().url().optional(),
+    order: z.number().optional(),
+  }),
+});
+
+const media = defineCollection({
+  type: "content",
+  schema: z.object({
+    slug: z.string(),
+    title: z.string(),
+    image: z.string(),
+    alt: z.string().optional(),
+    credit: z.string().optional(),
+    creditUrl: z.string().url().optional(),
+  }),
+});
+
+export const collections = { projects, team, publications, resources, partners, media };

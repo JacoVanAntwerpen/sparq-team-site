@@ -1,0 +1,49 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Section from '@components/Section.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('publications');
+  return entries.map((e) => ({ params: { slug: e.slug }, props: { entry: e } }));
+}
+
+const { entry } = Astro.props;
+---
+<BaseLayout title={`${entry.data.title} — Publications — SPARQ Team`}>
+  <Section id="publication" title={entry.data.title} subtitle={`${entry.data.venue ?? ''}${entry.data.year ? (entry.data.venue ? ' · ' : '') + entry.data.year : ''}`}>
+    {entry.data.heroImage && (
+      <img src={entry.data.heroImage} alt={entry.data.title} class="w-full max-w-3xl rounded-2xl shadow-sm mb-6" loading="eager" />
+    )}
+
+    {entry.data.authors?.length > 0 && (
+      <div class="text-sm text-neutral-600 mb-4">Authors: {entry.data.authors.join(", ")}</div>
+    )}
+
+    {entry.data.abstract && <p class="text-neutral-800">{entry.data.abstract}</p>}
+
+    {(entry.data.links?.length || entry.data.doi || entry.data.url) && (
+      <div class="mt-6">
+        <h3 class="font-semibold mb-2">Links</h3>
+        <ul class="list-disc pl-5">
+          {entry.data.links?.map((l) => (
+            <li><a class="text-blue-700 underline" href={l.url} target="_blank">{l.label}</a></li>
+          ))}
+          {entry.data.doi && <li><a class="text-blue-700 underline" href={entry.data.doi} target="_blank">DOI</a></li>}
+          {entry.data.url && <li><a class="text-blue-700 underline" href={entry.data.url} target="_blank">External</a></li>}
+        </ul>
+      </div>
+    )}
+
+    {entry.data.files?.length > 0 && (
+      <div class="mt-6">
+        <h3 class="font-semibold mb-2">Downloads</h3>
+        <ul class="list-disc pl-5">
+          {entry.data.files.map((f) => (
+            <li><a class="text-blue-700 underline" href={f.file} download>{f.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </Section>
+</BaseLayout>

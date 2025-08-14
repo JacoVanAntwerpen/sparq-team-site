@@ -16,7 +16,7 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "One-line description", name: "shortDescription", widget: "string" }
 
-      # Markdown fallback if you skip the builder
+      # Optional markdown body if you don't use builder
       - { label: "Long details (markdown fallback)", name: "longDetails", widget: "markdown", required: false }
 
       # Content Builder (typed / orderable blocks)
@@ -58,51 +58,29 @@ collections:
           - label: "List"
             name: "list"
             widget: "object"
-            summary: "List ({{fields.style}})"
+            summary: "List"
             fields:
-              - label: "Style"
-                name: "style"
-                widget: "select"
-                options:
-                  - { label: "Bulleted", value: "ul" }
-                  - { label: "Numbered", value: "ol" }
-                default: "ul"
               - label: "Items"
                 name: "items"
                 widget: "list"
                 field: { label: "Item", name: "item", widget: "string" }
-          - label: "Link"
-            name: "link"
-            widget: "object"
-            summary: "Link: {{fields.label}}"
-            fields:
-              - { label: "Label", name: "label", widget: "string" }
-              - { label: "URL", name: "url", widget: "string" }
-          - label: "File"
-            name: "file"
-            widget: "object"
-            summary: "File: {{fields.label}}"
-            fields:
-              - { label: "Label", name: "label", widget: "string" }
-              - { label: "File", name: "file", widget: "file" }
 
-      # Hero controls
+      # Media for tiles & hero
+      - { label: "Tile image (for cards)", name: "tileImage", widget: "image", required: false }
+      - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - label: "Hero layout"
         name: "heroLayout"
         widget: "select"
-        required: false
-        default: "full"
+        default: "standard"
         options:
-          - { label: "Full (below title)", value: "full" }
-          - { label: "Banner (above title)", value: "banner" }
-          - { label: "Aside (portrait right)", value: "aside" }
+          - { label: "Standard (in content)", value: "standard" }
+          - { label: "Wide (edge-to-edge within container)", value: "wide" }
+          - { label: "Full-bleed (edge of page)", value: "edge" }
           - { label: "None", value: "none" }
-      - { label: "Hero alt text", name: "heroAlt", widget: "string", required: false }
       - label: "Hero focal point"
-        name: "heroFocal"
+        name: "heroFocalPoint"
         widget: "select"
-        required: false
         default: "center"
         options:
           - center
@@ -118,41 +96,6 @@ collections:
       - { label: "Hero credit (name)", name: "heroCredit", widget: "string", required: false }
       - { label: "Hero credit URL", name: "heroCreditUrl", widget: "string", required: false }
 
-      - { label: "Tile image (grid card)", name: "tileImage", widget: "image", required: false }
-      - { label: "Completed (free text)", name: "completed", widget: "string", required: false }
-      - { label: "Featured?", name: "featured", widget: "boolean", required: false, default: false }
-      - label: "Tags"
-        name: "tags"
-        widget: "list"
-        required: false
-        field: { label: "Tag", name: "tag", widget: "string" }
-
-      # Bottom sections (legacy/extra)
-      - label: "Files (bottom section)"
-        name: "files"
-        widget: "list"
-        required: false
-        fields:
-          - { label: "Label", name: "label", widget: "string" }
-          - { label: "File", name: "file", widget: "file" }
-      - label: "Links (bottom section)"
-        name: "links"
-        widget: "list"
-        required: false
-        fields:
-          - { label: "Label", name: "label", widget: "string" }
-          - { label: "URL", name: "url", widget: "string" }
-
-  - name: resources
-    label: "Tools & Resources"
-    folder: src/content/resources
-    create: true
-    slug: "{{slug}}"
-    format: frontmatter
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "One-line description", name: "oneLine", widget: "string" }
-      - { label: "Summary", name: "summary", widget: "text", required: false }
       - label: "Files"
         name: "files"
         widget: "list"
@@ -160,6 +103,7 @@ collections:
         fields:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "File", name: "file", widget: "file" }
+
       - label: "Links"
         name: "links"
         widget: "list"
@@ -167,8 +111,18 @@ collections:
         fields:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "URL", name: "url", widget: "string" }
-      - { label: "Citation", name: "citation", widget: "text", required: false }
-      - { label: "Image", name: "image", widget: "image", required: false }
+
+      - { label: "Featured on home", name: "featured", widget: "boolean", default: false }
+
+      - label: "Partners involved"
+        name: "partners"
+        widget: "relation"
+        collection: "partners"
+        search_fields: ["name", "slug"]
+        display_fields: ["name"]
+        value_field: "slug"
+        multiple: true
+        required: false
 
   - name: team
     label: Team
@@ -190,16 +144,37 @@ collections:
       - { label: "Website", name: "website", widget: "string", required: false }
       - { label: "Order", name: "order", widget: "number", required: false }
       - { label: "Bio (Markdown)", name: "body", widget: "markdown", required: false }
-
+      - label: "Linked projects"
+        name: "linkedProjects"
+        widget: "relation"
+        collection: "projects"
+        search_fields: ["title","shortDescription","slug"]
+        display_fields: ["title"]
+        value_field: "slug"
+        multiple: true
+        required: false
+      - label: "Linked publications"
+        name: "linkedPublications"
+        widget: "relation"
+        collection: "publications"
+        search_fields: ["title","slug"]
+        display_fields: ["title"]
+        value_field: "slug"
+        multiple: true
+        required: false
 
   - name: publications
     label: Publications
     folder: src/content/publications
     create: true
-    slug: "{{slug}}"
+    slug: "{{fields.slug}}"
+    identifier_field: slug
     format: frontmatter
     fields:
-      - { label: "Title", name: "title, widget: string" }
+      - { label: "Slug (URL part)", name: "slug", widget: "string",
+          hint: "Lowercase, a-z, 0-9, hyphens only. Example: dai-2024-dynamic-tea",
+          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
+      - { label: "Title", name: "title", widget: "string" }
       - label: "Authors"
         name: "authors"
         widget: "list"
@@ -207,8 +182,17 @@ collections:
         field: { label: "Author", name: "author", widget: "string" }
       - { label: "Year", name: "year", widget: "number" }
       - { label: "Venue / Journal", name: "venue", widget: "string", required: false }
-      - { label: "DOI / URL", name: "url", widget: "string", required: false }
-      - { label: "Abstract (Markdown)", name: "body", widget: "markdown", required: false }
+      - { label: "DOI URL", name: "doi", widget: "string", required: false }
+      - { label: "External URL", name: "url", widget: "string", required: false }
+      - { label: "Abstract (Markdown)", name: "abstract", widget: "markdown", required: false }
+      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
+      - label: "Links"
+        name: "links"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "URL", name: "url", widget: "string" }
       - label: "Files"
         name: "files"
         widget: "list"
@@ -216,3 +200,67 @@ collections:
         fields:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "File", name: "file", widget: "file" }
+
+  - name: resources
+    label: Tools & Resources
+    folder: src/content/resources
+    create: true
+    slug: "{{fields.slug}}"
+    identifier_field: slug
+    format: frontmatter
+    fields:
+      - { label: "Slug (URL part)", name: "slug", widget: "string",
+          hint: "Lowercase, a-z, 0-9, hyphens only. Example: dynamic-tea-tool",
+          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "One-line description", name: "oneLine", widget: "string" }
+      - { label: "Summary (Markdown)", name: "summary", widget: "markdown", required: false }
+      - { label: "Tile / preview image", name: "image", widget: "image", required: false }
+      - label: "Links"
+        name: "links"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "URL", name: "url", widget: "string" }
+      - label: "Files"
+        name: "files"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "File", name: "file", widget: "file" }
+      - { label: "Citation (optional)", name: "citation", widget: "text", required: false }
+
+  - name: partners
+    label: Partners & Collaborators
+    folder: src/content/partners
+    create: true
+    slug: "{{fields.slug}}"
+    identifier_field: slug
+    format: frontmatter
+    fields:
+      - { label: "Slug (URL part)", name: "slug", widget: "string",
+          hint: "Lowercase, a-z, 0-9, hyphens only. Example: unsw",
+          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Logo", name: "logo", widget: "image" }
+      - { label: "Website", name: "url", widget: "string", required: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
+
+  - name: media
+    label: General Images
+    folder: src/content/media
+    create: true
+    slug: "{{fields.slug}}"
+    identifier_field: slug
+    format: frontmatter
+    fields:
+      - { label: "Slug (URL part)", name: "slug", widget: "string",
+          hint: "Lowercase, a-z, 0-9, hyphens only. Example: green-ammonia-hero",
+          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Alt text", name: "alt", widget: "string", required: false }
+      - { label: "Credit (text)", name: "credit", widget: "string", required: false }
+      - { label: "Credit URL", name: "creditUrl", widget: "string", required: false }

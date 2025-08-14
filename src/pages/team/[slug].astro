@@ -22,7 +22,8 @@ const linkedPubs = pubs.filter(p => entry.data.linkedPublications?.includes(p.sl
 
     <div class="mt-6 space-y-2 text-sm">
       {entry.data.email && <div>Email: <a class="text-blue-700" href={`mailto:${entry.data.email}`}>{entry.data.email}</a></div>}
-      {entry.data.linkedin && <div>LinkedIn: <a class="text-blue-700" href={entry.data.linkedin}>{entry.data.linkedin}</a></div>}
+      {entry.data.linkedin && <div>LinkedIn: <a class="text-blue-700" href={entry.data.linkedin} target="_blank">{entry.data.linkedin}</a></div>}
+      {entry.data.website && <div>Website: <a class="text-blue-700" href={entry.data.website} target="_blank">{entry.data.website}</a></div>}
     </div>
 
     {linkedProjects.length > 0 && (
@@ -38,7 +39,7 @@ const linkedPubs = pubs.filter(p => entry.data.linkedPublications?.includes(p.sl
       <div class="mt-10">
         <h3 class="font-semibold mb-3">Publications</h3>
         <ul class="list-disc pl-5">
-          {linkedPubs.map(p => (<li><a class="text-blue-700" href={`/publications#${p.slug}`}>{p.data.title}</a></li>))}
+          {linkedPubs.map(p => (<li><a class="text-blue-700" href={`/publications/${p.slug}`}>{p.data.title}</a></li>))}
         </ul>
       </div>
     )}

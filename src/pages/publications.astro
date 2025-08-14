@@ -9,11 +9,16 @@ const pubs = await getCollection('publications');
     <div class="divide-y rounded-2xl border border-neutral-200 bg-white">
       {pubs.map((p) => (
         <div id={p.slug} class="p-5">
-          <div class="font-medium">{p.data.title}</div>
-          {p.data.heroImage && <img src={p.data.heroImage} alt="" class="my-3 rounded-xl border" />}
-          {p.data.abstract && <p class="text-sm text-neutral-700">{p.data.abstract}</p>}
+          <div class="font-medium"><a class="hover:underline" href={`/publications/${p.slug}`}>{p.data.title}</a></div>
+          {p.data.venue && <div class="text-sm text-neutral-600">{p.data.venue}{p.data.year ? ` (${p.data.year})` : ''}</div>}
           {p.data.authors?.length > 0 && <div class="text-xs text-neutral-600 mt-1">Authors: {p.data.authors.join(", ")}</div>}
-          <a href={p.data.url} class="mt-2 inline-block text-sm text-blue-700 hover:underline">View publication →</a>
+          {p.data.heroImage && <img src={p.data.heroImage} alt="" class="my-3 rounded-xl border" loading="lazy" />}
+          {p.data.abstract && <p class="text-sm text-neutral-700">{p.data.abstract}</p>}
+          <div class="mt-2 space-x-4">
+            <a href={`/publications/${p.slug}`} class="inline-block text-sm text-blue-700 hover:underline">Details →</a>
+            {p.data.doi && <a href={p.data.doi} target="_blank" class="inline-block text-sm text-blue-700 hover:underline">DOI</a>}
+            {p.data.url && <a href={p.data.url} target="_blank" class="inline-block text-sm text-blue-700 hover:underline">External</a>}
+          </div>
         </div>
       ))}
     </div>
