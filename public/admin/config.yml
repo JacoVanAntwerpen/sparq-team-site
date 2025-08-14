@@ -10,7 +10,7 @@ collections:
     label: Projects
     folder: src/content/projects
     create: true
-    # leave default file slug from title
+    # derive filename/URL from title
     slug: "{{slug}}"
     format: frontmatter
     fields:
@@ -29,35 +29,23 @@ collections:
           - label: "Header"
             name: "header"
             widget: "object"
-            summary: "Header: {{fields.text}}"
             fields:
               - { label: "Text", name: "text", widget: "string" }
-              - label: "Level"
-                name: "level"
-                widget: "select"
-                options: ["h2","h3","h4"]
-                default: "h2"
+              - { label: "Level", name: "level", widget: "select", options: ["h2","h3","h4"], default: "h2" }
           - label: "Subheader"
             name: "subheader"
             widget: "object"
-            summary: "Subheader: {{fields.text}}"
             fields:
               - { label: "Text", name: "text", widget: "string" }
-              - label: "Level"
-                name: "level"
-                widget: "select"
-                options: ["h3","h4"]
-                default: "h3"
+              - { label: "Level", name: "level", widget: "select", options: ["h3","h4"], default: "h3" }
           - label: "Paragraph"
             name: "paragraph"
             widget: "object"
-            summary: "Paragraph"
             fields:
               - { label: "Body (Markdown)", name: "body", widget: "markdown" }
           - label: "List"
             name: "list"
             widget: "object"
-            summary: "List"
             fields:
               - label: "Items"
                 name: "items"
@@ -66,6 +54,7 @@ collections:
 
       - { label: "Tile image (for cards)", name: "tileImage", widget: "image", required: false }
       - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
+
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - label: "Hero layout"
         name: "heroLayout"
@@ -127,7 +116,7 @@ collections:
     label: Team
     folder: src/content/team
     create: true
-    # make filename/URL from name
+    # derive filename/URL from name
     slug: "{{name}}"
     format: frontmatter
     fields:
@@ -163,11 +152,10 @@ collections:
     label: Publications
     folder: src/content/publications
     create: true
-    # use year + title for stable URLs
+    # stable URLs: /publications/2025-my-paper-title
     slug: "{{year}}-{{title}}"
     format: frontmatter
     fields:
-      # (no 'slug' field)
       - { label: "Title", name: "title", widget: "string" }
       - label: "Authors"
         name: "authors"
@@ -176,8 +164,8 @@ collections:
         field: { label: "Author", name: "author", widget: "string" }
       - { label: "Year", name: "year", widget: "number" }
       - { label: "Venue / Journal", name: "venue", widget: "string", required: false }
-      - { label: "DOI URL", name: "doi", widget: "string", required: false }
-      - { label: "External URL", name: "url", widget: "string", required: false }
+      - { label: "DOI URL or handle", name: "doi", widget: "string", required: false }
+      - { label: "External URL", name: "url", widget: "string", hint: "Use full https://… or /relative", required: false }
       - { label: "Abstract (Markdown)", name: "abstract", widget: "markdown", required: false }
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - label: "Links"
@@ -186,7 +174,7 @@ collections:
         required: false
         fields:
           - { label: "Label", name: "label", widget: "string" }
-          - { label: "URL", name: "url", widget: "string" }
+          - { label: "URL", name: "url", widget: "string", hint: "Use full https://… or /relative" }
       - label: "Files"
         name: "files"
         widget: "list"
