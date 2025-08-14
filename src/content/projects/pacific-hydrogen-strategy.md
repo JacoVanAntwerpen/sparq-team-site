@@ -38,13 +38,14 @@ longDetails: >-
   Foster regional capacity in hydrogen technology, feasibility analysis, and policy development.
 
   Accelerate progress toward decarbonisation, energy security, and alignment with global net-zero goals.
+tileImage: /uploads/screenshot-2025-08-07-141022.png
 heroImage: /uploads/vanuatu3-2048x1536.jpg
 heroLayout: aside
-heroFocal: center
-tileImage: /uploads/screenshot-2025-08-07-141022.png
+heroFocalPoint: center
+partners:
+  - ""
 completed: ""
-featured: true
-tags: []
+heroFocal: center
 files:
   - label: Report A
     file: /uploads/report-a.zip
@@ -56,6 +57,8 @@ files:
     file: /uploads/report-d_a-hydrogen-roadmap-for-the-pacific_draft-for-consultation.pdf
   - label: Open-source tools
     file: /uploads/pacific-hydrogen-and-derivatives-tools.zip
+featured: true
+tags: []
 links:
   - label: pacificH2strategy Project Site
     url: https://pacifich2strategy.com/
