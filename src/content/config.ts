@@ -94,17 +94,21 @@ const projects = defineCollection({
 const team = defineCollection({
   type: "content",
   schema: z.object({
-    name: z.string(),
+    slug: z.string().optional(),         // <— allow custom slug
     prefix: z.string().optional(),
+    name: z.string(),
     role: z.string().optional(),
     photo: z.string().optional(),
     email: z.string().email().optional(),
     linkedin: z.string().url().optional(),
     website: z.string().url().optional(),
     order: z.number().optional(),
-    body: z.string().optional(), // markdown body
+    body: z.string().optional(),
+    title: z.string().optional(),        // compatibility if you used `title`
   }),
 });
+
+
 
 const publications = defineCollection({
   type: "content",

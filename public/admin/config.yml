@@ -174,19 +174,23 @@ collections:
     label: Team
     folder: src/content/team
     create: true
-    slug: "{{slug}}"
+    identifier_field: slug
+    slug: "{{fields.slug}}"
     format: frontmatter
     fields:
-      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Slug (URL part)", name: "slug", widget: "string",
+          hint: "Lowercase, a-z, 0-9, hyphens only. Example: jaco-van-antwerpen",
+          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers and hyphens only"] }
       - { label: "Prefix (e.g., Dr.)", name: "prefix", widget: "string", required: false }
+      - { label: "Name", name: "name", widget: "string" }
       - { label: "Role / Title", name: "role", widget: "string", required: false }
       - { label: "Photo", name: "photo", widget: "image", required: false }
       - { label: "Email", name: "email", widget: "string", required: false }
       - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
       - { label: "Website", name: "website", widget: "string", required: false }
-      - { label: "Short bio (Markdown)", name: "body", widget: "markdown", required: false }
-      # Optional ordering field if you want to control grid order:
       - { label: "Order", name: "order", widget: "number", required: false }
+      - { label: "Bio (Markdown)", name: "body", widget: "markdown", required: false }
+
 
   - name: publications
     label: Publications
