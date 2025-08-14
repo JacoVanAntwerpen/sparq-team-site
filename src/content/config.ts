@@ -22,8 +22,9 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     shortDescription: z.string(),
-    longDetails: z.string().optional(), // optional markdown fallback
-    content: z.any().optional(),        // content builder (kept for compatibility)
+    longDetails: z.string().optional(),
+    content: z.any().optional(),
+
     featured: z.boolean().default(false),
 
     // Tile image for cards
@@ -32,7 +33,8 @@ const projects = defineCollection({
 
     // Hero configuration for detail page
     heroImage: z.string().optional(),
-    heroLayout: z.enum(["standard","wide","edge","none"]).default("standard"),
+    // ✅ Added "aside" here
+    heroLayout: z.enum(["standard","wide","edge","none","aside"]).default("standard"),
     heroFocalPoint: z.enum([
       "center","top","bottom","left","right",
       "top-left","top-right","bottom-left","bottom-right"
@@ -53,7 +55,7 @@ const projects = defineCollection({
 const team = defineCollection({
   type: "content",
   schema: z.object({
-    slug: z.string().optional(),         // allow custom slug
+    slug: z.string().optional(),
     prefix: z.string().optional(),
     name: z.string(),
     role: z.string().optional(),
@@ -65,7 +67,7 @@ const team = defineCollection({
     linkedProjects: z.array(z.string()).default([]),
     linkedPublications: z.array(z.string()).default([]),
     body: z.string().optional(),
-    title: z.string().optional(),        // compatibility if you used `title`
+    title: z.string().optional(),
   }),
 });
 
@@ -78,7 +80,7 @@ const publications = defineCollection({
     year: z.number(),
     venue: z.string().optional(),
     doi: z.string().url().optional(),
-    url: z.string().url().optional(), // legacy / external landing
+    url: z.string().url().optional(),
     abstract: z.string().optional(),
     heroImage: z.string().optional(),
     links: z.array(link).default([]),
@@ -105,7 +107,7 @@ const partners = defineCollection({
   schema: z.object({
     slug: z.string(),
     name: z.string(),
-    logo: z.string(),           // /uploads/...
+    logo: z.string(),
     url: z.string().url().optional(),
     order: z.number().optional(),
   }),

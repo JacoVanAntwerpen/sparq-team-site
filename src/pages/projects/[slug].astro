@@ -1,5 +1,4 @@
 ---
-// (same imports as before)
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
 import { getCollection } from 'astro:content';
@@ -13,10 +12,8 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 
-// Helpers
 const md = (s?: string) => (s ? marked.parse(s) : '');
 
-// Data from front-matter (all optional)
 const heroUrl       = entry.data.heroImage as string | undefined;
 const heroLayout    = (entry.data.heroLayout as string | undefined) ?? 'standard';
 const heroFocal     = (entry.data.heroFocalPoint as string | undefined) ?? 'center';
@@ -31,10 +28,9 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
 <BaseLayout title={`${entry.data.title} — SPARQ Team`}>
   <Section id="project" title={entry.data.title} subtitle={entry.data.shortDescription}>
 
-    {/* HERO — preset layouts */}
     {heroUrl && heroLayout !== 'none' && (
       <>
-        {/* STANDARD: full-width within content container */}
+        {/* STANDARD */}
         {heroLayout === 'standard' && (
           <figure class="mb-8">
             <img src={heroUrl} alt={entry.data.title} class="w-full rounded-2xl shadow-sm" loading="eager" />
@@ -59,10 +55,28 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
           </figure>
         )}
 
-        {/* EDGE (full-bleed) */}
+        {/* EDGE */}
         {heroLayout === 'edge' && (
           <figure class="mb-8">
             <img src={heroUrl} alt={entry.data.title} class="w-screen max-w-none relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] object-cover" style={`object-position:${heroFocal}`} loading="eager" />
+          </figure>
+        )}
+
+        {/* ✅ ASIDE — float right on md+ so the content wraps */}
+        {heroLayout === 'aside' && (
+          <figure class="mb-6 md:float-right md:ml-6 md:mb-6 md:w-[45%]">
+            <img src={heroUrl} alt={entry.data.title} class="w-full rounded-2xl shadow-sm object-cover" style={`object-position:${heroFocal}`} loading="eager" />
+            {(heroCredit || heroCreditUrl) && (
+              <figcaption class="mt-2 text-sm text-neutral-600">
+                Photo:{' '}
+                {heroCreditUrl ? (
+                  <a class="text-blue-700 underline" href={heroCreditUrl} target="_blank">{heroCredit || heroCreditUrl}</a>
+                ) : (
+                  heroCredit
+                )}
+              </figcaption>
+            )}
+            {heroCaption && <div class="text-sm text-neutral-700 mt-1">{heroCaption}</div>}
           </figure>
         )}
       </>
@@ -73,10 +87,13 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
       <div class="prose max-w-none" set:html={md(entry.data.longDetails)} />
     )}
 
-    {/* Content slot from file body (optional) */}
+    {/* Body content (optional) */}
     <article class="prose max-w-none">
       <Content />
     </article>
+
+    {/* Clear float from 'aside' to not affect subsequent sections */}
+    {heroLayout === 'aside' && <div class="clear-both"></div>}
 
     {/* LINKS */}
     {links.length > 0 && (
@@ -96,17 +113,13 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
         <h3 class="font-semibold mb-2">Downloads</h3>
         <ul class="list-disc pl-5">
           {files.map((f) => (
-            <li>
-              <a class="text-blue-700 underline" href={f.file} download>
-                {f.label}
-              </a>
-            </li>
+            <li><a class="text-blue-700 underline" href={f.file} download>{f.label}</a></li>
           ))}
         </ul>
       </div>
     )}
 
-    {/* PARTNERS — logos at bottom */}
+    {/* PARTNERS */}
     {Array.isArray(entry.data.partners) && entry.data.partners.length > 0 && (
       <div class="mt-10">
         <h3 class="font-semibold mb-3">Collaborators & partners</h3>
