@@ -1,5 +1,4 @@
 ---
-import { SITE } from '@data/site';
 const NAV = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
@@ -12,22 +11,37 @@ const NAV = [
 ---
 <header class="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur">
   <div class="mx-auto max-w-7xl px-4 h-16 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-2">
-      <div class="text-xl md:text-2xl font-extrabold tracking-wide">
-        SPAR<span class="relative inline-block">Q
-          <span class="absolute -right-2 -top-1 rotate-12">⚡</span>
-        </span>
+    <a href="/" class="flex items-center gap-3" aria-label="SPARQ home">
+      <div class="relative flex items-center">
+        <div class="text-2xl font-extrabold tracking-wide">
+          SPAR<span class="relative inline-block align-baseline">Q
+            <!-- cleaner lightning placement inside the Q counter -->
+            <span
+              aria-hidden="true"
+              class="pointer-events-none absolute -right-2 -top-1 rotate-12 leading-none"
+              style="font-size:0.9em"
+            >⚡</span>
+          </span>
+        </div>
       </div>
-      <span class="hidden sm:block text-xs text-neutral-500">Techno‑economic analysis</span>
+      <span class="hidden sm:inline-block text-sm md:text-base font-medium tracking-tight text-neutral-600">
+        Techno-economic analysis
+      </span>
     </a>
+
     <nav class="hidden md:flex items-center gap-1">
-      {NAV.map(n => (
+      {NAV.map((n) => (
         <a href={n.href} class="rounded-xl px-3 py-2 text-sm font-medium hover:bg-neutral-100">{n.label}</a>
       ))}
     </nav>
+
     <div class="md:hidden">
-      <select class="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm" onchange={`location.href=this.value`}>
-        {NAV.map(n => (<option value={n.href}>{n.label}</option>))}
+      <select
+        class="rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm"
+        onchange={`location.href=this.value`}
+        aria-label="Navigate"
+      >
+        {NAV.map((n) => (<option value={n.href}>{n.label}</option>))}
       </select>
     </div>
   </div>

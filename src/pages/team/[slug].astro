@@ -1,47 +1,103 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Section from '@components/Section.astro';
-import { getCollection, getEntryBySlug } from 'astro:content';
+import { getCollection } from 'astro:content';
+
 export async function getStaticPaths() {
   const entries = await getCollection('team');
   return entries.map((e) => ({ params: { slug: e.slug }, props: { entry: e } }));
 }
+
 const { entry } = Astro.props;
 const projects = await getCollection('projects');
 const pubs = await getCollection('publications');
 
-const linkedProjects = projects.filter(p => entry.data.linkedProjects?.includes(p.slug));
-const linkedPubs = pubs.filter(p => entry.data.linkedPublications?.includes(p.slug));
+const linkedProjects = projects.filter((p) => entry.data.linkedProjects?.includes(p.slug));
+const linkedPubs = pubs.filter((p) => entry.data.linkedPublications?.includes(p.slug));
+
+const { Content } = await entry.render();
+const name = [entry.data.prefix, entry.data.name].filter(Boolean).join(' ').trim();
+const role = entry.data.role ?? entry.data.title ?? '';
+const photo = entry.data.photo || '/uploads/avatar-placeholder.png';
 ---
-<BaseLayout title={`${entry.data.name} — SPARQ Team`}>
-  <Section title={`${entry.data.prefix ? entry.data.prefix + ' ' : ''}${entry.data.name}`} subtitle={entry.data.title}>
-    <div class="prose max-w-none">
-      {entry.data.longSummary && <p>{entry.data.longSummary}</p>}
-      <slot />
-    </div>
+<BaseLayout title={`${name} — SPARQ`}>
+  <section class="py-12">
+    <div class="mx-auto max-w-7xl px-4">
+      <div class="grid gap-10 md:grid-cols-[260px,1fr]">
+        <!-- Left: portrait + contacts -->
+        <aside class="space-y-6">
+          <img
+            src={photo}
+            alt={name}
+            class="h-56 w-56 rounded-2xl object-cover ring-1 ring-neutral-200"
+            loading="lazy"
+          />
+          <div class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <h1 class="text-xl font-semibold">{name}</h1>
+            {role && <p class="mt-1 text-neutral-600">{role}</p>}
+            <div class="mt-4 space-y-2 text-sm">
+              {entry.data.email && (
+                <div>
+                  <span class="text-neutral-500">Email:</span>
+                  {' '}
+                  <a class="text-blue-700" href={`mailto:${entry.data.email}`}>{entry.data.email}</a>
+                </div>
+              )}
+              {entry.data.linkedin && (
+                <div>
+                  <span class="text-neutral-500">LinkedIn:</span>
+                  {' '}
+                  <a class="text-blue-700" href={entry.data.linkedin} target="_blank" rel="noopener">
+                    View profile
+                  </a>
+                </div>
+              )}
+              {entry.data.website && (
+                <div>
+                  <span class="text-neutral-500">Website:</span>
+                  {' '}
+                  <a class="text-blue-700" href={entry.data.website} target="_blank" rel="noopener">
+                    {entry.data.website}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </aside>
 
-    <div class="mt-6 space-y-2 text-sm">
-      {entry.data.email && <div>Email: <a class="text-blue-700" href={`mailto:${entry.data.email}`}>{entry.data.email}</a></div>}
-      {entry.data.linkedin && <div>LinkedIn: <a class="text-blue-700" href={entry.data.linkedin} target="_blank">{entry.data.linkedin}</a></div>}
-      {entry.data.website && <div>Website: <a class="text-blue-700" href={entry.data.website} target="_blank">{entry.data.website}</a></div>}
-    </div>
+        <!-- Right: bio + linked content -->
+        <div>
+          {entry.data.longSummary && <p class="text-lg text-neutral-800">{entry.data.longSummary}</p>}
+          <article class="prose max-w-none mt-6">
+            <Content />
+          </article>
 
-    {linkedProjects.length > 0 && (
-      <div class="mt-10">
-        <h3 class="font-semibold mb-3">Projects</h3>
-        <ul class="list-disc pl-5">
-          {linkedProjects.map(p => (<li><a class="text-blue-700" href={`/projects/${p.slug}`}>{p.data.title}</a></li>))}
-        </ul>
+          {linkedProjects.length > 0 && (
+            <div class="mt-10">
+              <h2 class="text-xl font-semibold mb-3">Projects</h2>
+              <ul class="list-disc pl-5">
+                {linkedProjects.map((p) => (
+                  <li>
+                    <a class="text-blue-700" href={`/projects/${p.slug}`}>{p.data.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {linkedPubs.length > 0 && (
+            <div class="mt-10">
+              <h2 class="text-xl font-semibold mb-3">Publications</h2>
+              <ul class="list-disc pl-5">
+                {linkedPubs.map((p) => (
+                  <li>
+                    <a class="text-blue-700" href={`/publications/${p.slug}`}>{p.data.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
-    )}
-
-    {linkedPubs.length > 0 && (
-      <div class="mt-10">
-        <h3 class="font-semibold mb-3">Publications</h3>
-        <ul class="list-disc pl-5">
-          {linkedPubs.map(p => (<li><a class="text-blue-700" href={`/publications/${p.slug}`}>{p.data.title}</a></li>))}
-        </ul>
-      </div>
-    )}
-  </Section>
+    </div>
+  </section>
 </BaseLayout>

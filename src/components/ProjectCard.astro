@@ -1,0 +1,34 @@
+---
+const { project } = Astro.props as { project: any };
+const d = project?.data ?? {};
+const img = d.tileImage || d.heroImage || '/uploads/project-placeholder.jpg';
+
+const focus = (d.tileImageFocus || 'center') as string;
+const posMap: Record<string, string> = {
+  center: 'center',
+  top: 'center top',
+  bottom: 'center bottom',
+  left: 'left center',
+  right: 'right center',
+  'top-left': 'left top',
+  'top-right': 'right top',
+  'bottom-left': 'left bottom',
+  'bottom-right': 'right bottom',
+};
+const objectPosition = posMap[focus] || 'center';
+---
+<a href={`/projects/${project.slug}`} class="group block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition">
+  <div class="aspect-[16/9] w-full overflow-hidden bg-neutral-100">
+    <img
+      src={img}
+      alt={d.tileImageAlt || d.heroImageAlt || d.title}
+      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+      style={`object-position:${objectPosition};`}
+      loading="lazy"
+    />
+  </div>
+  <div class="p-5">
+    <h3 class="font-semibold">{d.title}</h3>
+    {d.shortDescription && <p class="mt-2 text-sm text-neutral-700">{d.shortDescription}</p>}
+  </div>
+</a>

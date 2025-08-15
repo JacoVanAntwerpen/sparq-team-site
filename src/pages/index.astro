@@ -6,10 +6,9 @@ import Collaborators from '@components/Collaborators.astro';
 import ContactForm from '@components/ContactForm.astro';
 import ExpertiseGrid from '@components/ExpertiseGrid.astro';
 import TeamGrid from '@components/TeamGrid.astro';
-
+import ProjectCard from '@components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 
-// Projects: keep your existing featured selection
 const allProjects = await getCollection('projects');
 const featured = allProjects.filter((p) => p.data.featured).slice(0, 6);
 ---
@@ -20,28 +19,23 @@ const featured = allProjects.filter((p) => p.data.featured).slice(0, 6);
     <ExpertiseGrid />
   </Section>
 
-  <Section id="team" title="Team" subtitle="People behind the work.">
-    <TeamGrid />
+  <!-- Team panel: improved tiles + CTA -->
+  <Section id="team" title="Team">
+    <TeamGrid limit={4} />
+    <div class="mt-8">
+      <a
+        href="/team"
+        class="inline-flex items-center rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-neutral-50"
+      >
+        Meet the team →
+      </a>
+    </div>
   </Section>
 
-  <Section id="projects" title="Featured projects" subtitle="Representative work—replace with your own.">
+  <!-- Featured projects: no placeholder subtitle -->
+  <Section id="projects" title="Featured projects">
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {featured.map((p) => {
-        const img = p.data.tileImage || p.data.heroImage;
-        return (
-        <a
-          href={`/projects/${p.slug}`}
-          class="rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow block overflow-hidden"
-        >
-          {img && (
-            <img src={img} alt={p.data.tileImageAlt || p.data.title} class="h-40 w-full object-cover" loading="lazy" />
-          )}
-          <div class="p-6">
-            <h3 class="font-semibold">{p.data.title}</h3>
-            <p class="mt-2 text-sm text-neutral-700">{p.data.shortDescription}</p>
-          </div>
-        </a>
-      )})}
+      {featured.map((p) => <ProjectCard project={p} />)}
     </div>
   </Section>
 
@@ -49,7 +43,7 @@ const featured = allProjects.filter((p) => p.data.featured).slice(0, 6);
     <Collaborators />
   </Section>
 
-  <Section id="contact" title="Contact" subtitle="Tell us about your project.">
+  <Section id="contact" title="Contact">
     <ContactForm />
   </Section>
 </BaseLayout>

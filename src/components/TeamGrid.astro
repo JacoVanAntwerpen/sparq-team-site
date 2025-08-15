@@ -1,31 +1,25 @@
 ---
 import { getCollection } from 'astro:content';
+import TeamCard from './TeamCard.astro';
 
-const team = (await getCollection('team'))
-  .sort((a, b) => {
-    const ao = a.data.order ?? 9999;
-    const bo = b.data.order ?? 9999;
-    if (ao !== bo) return ao - bo;
-    return a.data.name.localeCompare(b.data.name);
-  });
+const { limit = undefined, extraClass = '' } = Astro.props as {
+  limit?: number;
+  extraClass?: string;
+};
+
+let team = await getCollection('team');
+
+team = team.sort((a, b) => {
+  const ao = a.data?.order ?? 9999;
+  const bo = b.data?.order ?? 9999;
+  if (ao !== bo) return ao - bo;
+  return (a.data?.name ?? '').localeCompare(b.data?.name ?? '');
+});
+
+if (typeof limit === 'number') {
+  team = team.slice(0, Math.max(0, limit));
+}
 ---
-<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-  {team.map((m) => (
-    <a href={`/team/${m.slug}`} class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow block">
-      <div class="flex items-start gap-4">
-        {m.data.photo ? (
-          <img src={m.data.photo} alt={m.data.name} class="h-12 w-12 rounded-full object-cover ring-1 ring-neutral-200" loading="lazy" />
-        ) : (
-          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100 ring-1 ring-neutral-200 text-sm font-semibold text-neutral-700">
-            {(m.data.name || '').split(' ').map(p=>p[0]).join('').slice(0,3).toUpperCase()}
-          </div>
-        )}
-        <div>
-          <h3 class="font-semibold">{m.data.prefix ? `${m.data.prefix} ` : ''}{m.data.name}</h3>
-          {m.data.role && <p class="text-sm text-neutral-600">{m.data.role}</p>}
-          {m.data.email && <p class="mt-2 text-sm text-neutral-700"><span class="text-neutral-500">Email:</span> {m.data.email}</p>}
-        </div>
-      </div>
-    </a>
-  ))}
+<div class={`grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${extraClass ?? ''}`}>
+  {team.map((p) => <TeamCard person={p} />)}
 </div>

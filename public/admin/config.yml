@@ -6,84 +6,76 @@ media_folder: public/uploads
 public_folder: /uploads
 
 collections:
+  # -----------------------------
+  # Projects
+  # -----------------------------
   - name: projects
     label: Projects
     folder: src/content/projects
     create: true
-    # derive filename/URL from title
     slug: "{{slug}}"
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "One-line description", name: "shortDescription", widget: "string" }
+      - { label: "One-line description", name: "shortDescription", widget: "string", required: false }
+      - { label: "Long details (markdown)", name: "longDetails", widget: "markdown", required: false }
 
-      - { label: "Long details (markdown fallback)", name: "longDetails", widget: "markdown", required: false }
-
+      # Optional content builder (kept compatible)
       - label: "Content Builder"
         name: "content"
         widget: "list"
+        required: false
         summary: "{{fields.type}}"
         typeKey: "type"
-        required: false
         types:
           - label: "Header"
             name: "header"
             widget: "object"
+            summary: "Header: {{fields.text}}"
             fields:
               - { label: "Text", name: "text", widget: "string" }
-              - { label: "Level", name: "level", widget: "select", options: ["h2","h3","h4"], default: "h2" }
-          - label: "Subheader"
-            name: "subheader"
-            widget: "object"
-            fields:
-              - { label: "Text", name: "text", widget: "string" }
-              - { label: "Level", name: "level", widget: "select", options: ["h3","h4"], default: "h3" }
+              - label: "Level"
+                name: "level"
+                widget: "select"
+                options: ["h2","h3","h4"]
+                default: "h2"
           - label: "Paragraph"
             name: "paragraph"
             widget: "object"
             fields:
               - { label: "Body (Markdown)", name: "body", widget: "markdown" }
-          - label: "List"
-            name: "list"
+          - label: "Image"
+            name: "image"
             widget: "object"
             fields:
-              - label: "Items"
-                name: "items"
-                widget: "list"
-                field: { label: "Item", name: "item", widget: "string" }
+              - { label: "File", name: "src", widget: "image" }
+              - { label: "Alt text", name: "alt", widget: "string", required: false }
+
+      # Hero & card images
+      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
+      - { label: "Hero image alt", name: "heroImageAlt", widget: "string", required: false }
 
       - { label: "Tile image (for cards)", name: "tileImage", widget: "image", required: false }
       - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
 
-      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
-      - label: "Hero layout"
-        name: "heroLayout"
+      # NEW: focal point used by the frontend for cropping in cards
+      - label: "Tile image focus"
+        name: "tileImageFocus"
         widget: "select"
-        default: "standard"
+        required: false
         options:
-          - { label: "Standard (in content)", value: "standard" }
-          - { label: "Wide (edge-to-edge within container)", value: "wide" }
-          - { label: "Full-bleed (edge of page)", value: "edge" }
-          - { label: "None", value: "none" }
-          - { label: "Aside (float right)", value: "aside" }
-      - label: "Hero focal point"
-        name: "heroFocalPoint"
-        widget: "select"
+          - { label: "Center", value: "center" }
+          - { label: "Top", value: "top" }
+          - { label: "Bottom", value: "bottom" }
+          - { label: "Left", value: "left" }
+          - { label: "Right", value: "right" }
+          - { label: "Top-left", value: "top-left" }
+          - { label: "Top-right", value: "top-right" }
+          - { label: "Bottom-left", value: "bottom-left" }
+          - { label: "Bottom-right", value: "bottom-right" }
         default: "center"
-        options:
-          - center
-          - top
-          - bottom
-          - left
-          - right
-          - top-left
-          - top-right
-          - bottom-left
-          - bottom-right
-      - { label: "Hero caption", name: "heroCaption", widget: "string", required: false }
-      - { label: "Hero credit (name)", name: "heroCredit", widget: "string", required: false }
-      - { label: "Hero credit URL", name: "heroCreditUrl", widget: "string", required: false }
 
+      # Attachments & external links
       - label: "Files"
         name: "files"
         widget: "list"
@@ -100,128 +92,117 @@ collections:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "URL", name: "url", widget: "string" }
 
+      - { label: "Completed (date)", name: "completed", widget: "datetime", required: false }
       - { label: "Featured on home", name: "featured", widget: "boolean", default: false }
 
+      # UPDATED: ordered, draggable partner list
       - label: "Partners involved"
         name: "partners"
-        widget: "relation"
-        collection: "partners"
-        search_fields: ["name", "slug"]
-        display_fields: ["name"]
-        value_field: "slug"
-        multiple: true
+        widget: "list"
         required: false
+        summary: "{{fields.partner}}"
+        fields:
+          - label: "Partner"
+            name: "partner"
+            widget: "relation"
+            collection: "partners"
+            search_fields: ["name", "slug"]
+            display_fields: ["name"]
+            value_field: "slug"
 
+  # -----------------------------
+  # Team
+  # -----------------------------
   - name: team
     label: Team
     folder: src/content/team
     create: true
-    # derive filename/URL from name
-    slug: "{{name}}"
+    slug: "{{slug}}"
     format: frontmatter
     fields:
-      - { label: "Prefix (e.g., Dr.)", name: "prefix", widget: "string", required: false }
-      - { label: "Name", name: "name", widget: "string" }
-      - { label: "Role / Title", name: "role", widget: "string", required: false }
-      - { label: "Photo", name: "photo", widget: "image", required: false }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Prefix (Dr., Prof., etc.)", name: "prefix", widget: "string", required: false }
+      - { label: "Full name", name: "name", widget: "string" }
+      - { label: "Role/Title", name: "role", widget: "string", required: false }
+      - { label: "Headshot", name: "photo", widget: "image", required: false }
       - { label: "Email", name: "email", widget: "string", required: false }
-      - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+      - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false }
       - { label: "Website", name: "website", widget: "string", required: false }
+      - { label: "Short bio (optional)", name: "longSummary", widget: "text", required: false }
+      - { label: "Body (Markdown)", name: "body", widget: "markdown", required: false }
       - { label: "Order", name: "order", widget: "number", required: false }
-      - { label: "Bio (Markdown)", name: "body", widget: "markdown", required: false }
-      - label: "Linked projects"
+
+      - label: "Linked Projects"
         name: "linkedProjects"
         widget: "relation"
         collection: "projects"
-        search_fields: ["title","shortDescription","slug"]
-        display_fields: ["title"]
-        value_field: "slug"
-        multiple: true
-        required: false
-      - label: "Linked publications"
-        name: "linkedPublications"
-        widget: "relation"
-        collection: "publications"
-        search_fields: ["title","slug"]
+        search_fields: ["title", "slug"]
         display_fields: ["title"]
         value_field: "slug"
         multiple: true
         required: false
 
+      - label: "Linked Publications"
+        name: "linkedPublications"
+        widget: "relation"
+        collection: "publications"
+        search_fields: ["title", "slug"]
+        display_fields: ["title"]
+        value_field: "slug"
+        multiple: true
+        required: false
+
+  # -----------------------------
+  # Publications (minimal)
+  # -----------------------------
   - name: publications
     label: Publications
     folder: src/content/publications
     create: true
-    # stable URLs: /publications/2025-my-paper-title
-    slug: "{{year}}-{{title}}"
+    slug: "{{slug}}"
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - label: "Authors"
-        name: "authors"
-        widget: "list"
-        required: false
-        field: { label: "Author", name: "author", widget: "string" }
-      - { label: "Year", name: "year", widget: "number" }
-      - { label: "Venue / Journal", name: "venue", widget: "string", required: false }
-      - { label: "DOI URL or handle", name: "doi", widget: "string", required: false }
-      - { label: "External URL", name: "url", widget: "string", hint: "Use full https://… or /relative", required: false }
-      - { label: "Abstract (Markdown)", name: "abstract", widget: "markdown", required: false }
-      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
-      - label: "Links"
-        name: "links"
-        widget: "list"
-        required: false
-        fields:
-          - { label: "Label", name: "label", widget: "string" }
-          - { label: "URL", name: "url", widget: "string", hint: "Use full https://… or /relative" }
-      - label: "Files"
-        name: "files"
-        widget: "list"
-        required: false
-        fields:
-          - { label: "Label", name: "label", widget: "string" }
-          - { label: "File", name: "file", widget: "file" }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Authors", name: "authors", widget: "string", required: false }
+      - { label: "Year", name: "year", widget: "number", required: false }
+      - { label: "Journal/Outlet", name: "journal", widget: "string", required: false }
+      - { label: "DOI", name: "doi", widget: "string", required: false }
+      - { label: "URL", name: "url", widget: "string", required: false }
+      - { label: "Abstract", name: "body", widget: "markdown", required: false }
 
+  # -----------------------------
+  # Resources (kept simple)
+  # -----------------------------
   - name: resources
-    label: Tools & Resources
+    label: Resources
     folder: src/content/resources
     create: true
-    slug: "{{title}}"
+    slug: "{{slug}}"
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "One-line description", name: "oneLine", widget: "string" }
-      - { label: "Summary (Markdown)", name: "summary", widget: "markdown", required: false }
-      - { label: "Tile / preview image", name: "image", widget: "image", required: false }
-      - label: "Links"
-        name: "links"
-        widget: "list"
-        required: false
-        fields:
-          - { label: "Label", name: "label", widget: "string" }
-          - { label: "URL", name: "url", widget: "string" }
-      - label: "Files"
-        name: "files"
-        widget: "list"
-        required: false
-        fields:
-          - { label: "Label", name: "label", widget: "string" }
-          - { label: "File", name: "file", widget: "file" }
-      - { label: "Citation (optional)", name: "citation", widget: "text", required: false }
+      - { label: "Slug", name: "slug", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown", required: false }
 
+  # -----------------------------
+  # Partners
+  # -----------------------------
   - name: partners
-    label: Partners & Collaborators
+    label: Collaborators & Partners
     folder: src/content/partners
     create: true
-    slug: "{{name}}"
+    slug: "{{slug}}"
     format: frontmatter
     fields:
       - { label: "Name", name: "name", widget: "string" }
+      - { label: "Website URL", name: "url", widget: "string", required: false }
       - { label: "Logo", name: "logo", widget: "image" }
-      - { label: "Website", name: "url", widget: "string", required: false }
       - { label: "Order", name: "order", widget: "number", required: false }
 
+  # -----------------------------
+  # General image bucket
+  # -----------------------------
   - name: media
     label: General Images
     folder: src/content/media

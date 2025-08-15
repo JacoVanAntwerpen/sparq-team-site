@@ -1,16 +1,24 @@
 ---
 import { getCollection } from 'astro:content';
-const partners = (await getCollection('partners'))
-  .sort((a,b) => (a.data.order ?? 9999) - (b.data.order ?? 9999));
+const partners = (await getCollection('partners')).sort(
+  (a, b) => (a.data.order ?? 9999) - (b.data.order ?? 9999)
+);
 ---
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 items-center">
-  {partners.map((p) => (
-    <a href={p.data.url || '#'} target={p.data.url ? '_blank' : undefined} class="flex items-center justify-center rounded-xl border border-neutral-200 bg-white h-16">
-      {p.data.logo ? (
-        <img src={p.data.logo} alt={p.data.name} class="max-h-10 object-contain" loading="lazy" />
-      ) : (
-        <span class="text-neutral-600 font-semibold">{p.data.name}</span>
-      )}
-    </a>
-  ))}
+<!-- logo wall: bigger logos, no card chrome -->
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center">
+  {partners.map((p) => {
+    const Logo = (
+      <img
+        src={p.data.logo}
+        alt={p.data.name}
+        class="max-h-16 md:max-h-20 object-contain"
+        loading="lazy"
+      />
+    );
+    return p.data.url ? (
+      <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>{Logo}</a>
+    ) : (
+      <div aria-label={p.data.name}>{Logo}</div>
+    );
+  })}
 </div>
