@@ -17,16 +17,15 @@ collections:
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "One-line description", name: "shortDescription", widget: "string", required: false }
-      - { label: "Long details (markdown)", name: "longDetails", widget: "markdown", required: false }
+      - { label: "One-line description", name: "shortDescription", widget: "string" }
+      - { label: "Long details (markdown fallback)", name: "longDetails", widget: "markdown", required: false }
 
-      # Optional content builder (kept compatible)
       - label: "Content Builder"
         name: "content"
         widget: "list"
-        required: false
         summary: "{{fields.type}}"
         typeKey: "type"
+        required: false
         types:
           - label: "Header"
             name: "header"
@@ -37,43 +36,45 @@ collections:
               - label: "Level"
                 name: "level"
                 widget: "select"
-                options: ["h2","h3","h4"]
-                default: "h2"
+                options: ["h2", "h3", "h4"]
+                default: "h3"
+
           - label: "Paragraph"
             name: "paragraph"
             widget: "object"
+            summary: "Paragraph"
             fields:
-              - { label: "Body (Markdown)", name: "body", widget: "markdown" }
+              - { label: "Text (Markdown)", name: "body", widget: "markdown" }
+
           - label: "Image"
             name: "image"
             widget: "object"
+            summary: "Image: {{fields.alt}}"
             fields:
-              - { label: "File", name: "src", widget: "image" }
-              - { label: "Alt text", name: "alt", widget: "string", required: false }
+              - { label: "Image", name: "src", widget: "image" }
+              - { label: "Alt text", name: "alt", widget: "string" }
+              - { label: "Caption", name: "caption", widget: "string", required: false }
+              - { label: "Credit (text)", name: "credit", widget: "string", required: false }
+              - { label: "Credit URL", name: "creditUrl", widget: "string", required: false }
+              - label: "Alignment"
+                name: "align"
+                widget: "select"
+                options: ["left", "center", "right"]
+                default: "center"
 
-      # Hero & card images
-      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
-      - { label: "Hero image alt", name: "heroImageAlt", widget: "string", required: false }
+          - label: "Quote"
+            name: "quote"
+            widget: "object"
+            summary: "Quote: {{fields.text}}"
+            fields:
+              - { label: "Text", name: "text", widget: "text" }
+              - { label: "Attribution", name: "attribution", widget: "string", required: false }
 
-      - { label: "Tile image (for cards)", name: "tileImage", widget: "image", required: false }
-      - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
-
-      # NEW: focal point used by the frontend for cropping in cards
-      - label: "Tile image focus"
-        name: "tileImageFocus"
-        widget: "select"
-        required: false
-        options:
-          - { label: "Center", value: "center" }
-          - { label: "Top", value: "top" }
-          - { label: "Bottom", value: "bottom" }
-          - { label: "Left", value: "left" }
-          - { label: "Right", value: "right" }
-          - { label: "Top-left", value: "top-left" }
-          - { label: "Top-right", value: "top-right" }
-          - { label: "Bottom-left", value: "bottom-left" }
-          - { label: "Bottom-right", value: "bottom-right" }
-        default: "center"
+      # Hero & metadata
+      - { label: "Featured on home", name: "featured", widget: "boolean", default: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
+      - { label: "Last updated", name: "lastUpdated", widget: "datetime", required: false }
+      - { label: "Published", name: "published", widget: "boolean", default: true }
 
       # Attachments & external links
       - label: "Files"
@@ -81,8 +82,9 @@ collections:
         widget: "list"
         required: false
         fields:
-          - { label: "Label", name: "label", widget: "string" }
+          - { label: "Title", name: "title", widget: "string" }
           - { label: "File", name: "file", widget: "file" }
+          - { label: "Description", name: "description", widget: "string", required: false }
 
       - label: "Links"
         name: "links"
@@ -91,9 +93,6 @@ collections:
         fields:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "URL", name: "url", widget: "string" }
-
-      - { label: "Completed (date)", name: "completed", widget: "datetime", required: false }
-      - { label: "Featured on home", name: "featured", widget: "boolean", default: false }
 
       # UPDATED: ordered, draggable partner list
       - label: "Partners involved"
@@ -107,8 +106,8 @@ collections:
             widget: "relation"
             collection: "partners"
             search_fields: ["name", "slug"]
+            value_field: "{{slug}}"
             display_fields: ["name"]
-            value_field: "slug"
 
   # -----------------------------
   # Team
@@ -120,8 +119,6 @@ collections:
     slug: "{{slug}}"
     format: frontmatter
     fields:
-      - { label: "Slug", name: "slug", widget: "string" }
-      - { label: "Prefix (Dr., Prof., etc.)", name: "prefix", widget: "string", required: false }
       - { label: "Full name", name: "name", widget: "string" }
       - { label: "Role/Title", name: "role", widget: "string", required: false }
       - { label: "Headshot", name: "photo", widget: "image", required: false }
@@ -137,23 +134,13 @@ collections:
         widget: "relation"
         collection: "projects"
         search_fields: ["title", "slug"]
+        value_field: "{{slug}}"
         display_fields: ["title"]
-        value_field: "slug"
-        multiple: true
-        required: false
-
-      - label: "Linked Publications"
-        name: "linkedPublications"
-        widget: "relation"
-        collection: "publications"
-        search_fields: ["title", "slug"]
-        display_fields: ["title"]
-        value_field: "slug"
         multiple: true
         required: false
 
   # -----------------------------
-  # Publications (minimal)
+  # Publications
   # -----------------------------
   - name: publications
     label: Publications
@@ -163,16 +150,15 @@ collections:
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Slug", name: "slug", widget: "string" }
       - { label: "Authors", name: "authors", widget: "string", required: false }
+      - { label: "Journal / Venue", name: "venue", widget: "string", required: false }
       - { label: "Year", name: "year", widget: "number", required: false }
-      - { label: "Journal/Outlet", name: "journal", widget: "string", required: false }
-      - { label: "DOI", name: "doi", widget: "string", required: false }
-      - { label: "URL", name: "url", widget: "string", required: false }
-      - { label: "Abstract", name: "body", widget: "markdown", required: false }
+      - { label: "PDF", name: "pdf", widget: "file", required: false }
+      - { label: "DOI / URL", name: "url", widget: "string", required: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
 
   # -----------------------------
-  # Resources (kept simple)
+  # Resources
   # -----------------------------
   - name: resources
     label: Resources
@@ -182,8 +168,10 @@ collections:
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Slug", name: "slug", widget: "string" }
-      - { label: "Body", name: "body", widget: "markdown", required: false }
+      - { label: "Summary", name: "summary", widget: "text", required: false }
+      - { label: "File", name: "file", widget: "file", required: false }
+      - { label: "URL", name: "url", widget: "string", required: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
 
   # -----------------------------
   # Partners
@@ -198,6 +186,7 @@ collections:
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Website URL", name: "url", widget: "string", required: false }
       - { label: "Logo", name: "logo", widget: "image" }
+      - { label: "Affiliation (toggle)", name: "affiliate", widget: "boolean", default: false, required: false }
       - { label: "Order", name: "order", widget: "number", required: false }
 
   # -----------------------------

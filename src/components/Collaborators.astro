@@ -1,12 +1,44 @@
 ---
 import { getCollection } from 'astro:content';
-const partners = (await getCollection('partners')).sort(
+const partnersAll = (await getCollection('partners')).sort(
   (a, b) => (a.data.order ?? 9999) - (b.data.order ?? 9999)
 );
+
+// boolean flag: `affiliate` (default false)
+// group into affiliates and other collaborators/partners
+const affiliates = partnersAll.filter((p) => p.data.affiliate === true);
+const others = partnersAll.filter((p) => !p.data.affiliate);
 ---
-<!-- logo wall: bigger logos, no card chrome -->
+
+{affiliates.length > 0 && (
+  <>
+    <div class="mb-3 mt-1 flex items-center gap-3">
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-600">Affiliations</h3>
+      <div class="h-px flex-1 bg-gray-200"></div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center">
+      {affiliates.map((p) => {
+        const Logo = (
+          <img
+            src={p.data.logo}
+            alt={p.data.name}
+            class="max-h-16 md:max-h-20 object-contain"
+            loading="lazy"
+          />
+        );
+        return p.data.url ? (
+          <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>{Logo}</a>
+        ) : (
+          <div aria-label={p.data.name}>{Logo}</div>
+        );
+      })}
+    </div>
+    <div class="my-8 h-px bg-gray-200" />
+  </>
+)}
+
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center">
-  {partners.map((p) => {
+  {others.map((p) => {
     const Logo = (
       <img
         src={p.data.logo}
