@@ -1,56 +1,57 @@
 ---
+// src/components/Collaborators.astro
 import { getCollection } from 'astro:content';
 
 const partnersAll = (await getCollection('partners')).sort(
   (a, b) => (a.data.order ?? 9999) - (b.data.order ?? 9999)
 );
 
-// boolean flag: `affiliate` (default false)
+// Optional boolean in your content frontmatter: `affiliate: true`
 const affiliates = partnersAll.filter((p) => p.data.affiliate === true);
 const others = partnersAll.filter((p) => !p.data.affiliate);
 
-// Helper to render a single logo with a fixed-height box so SVGs never collapse.
-function LogoBox({ p }: { p: any }) {
-  const img = (
-    <img
-      src={p.data.logo}
-      alt={p.data.name}
-      loading="lazy"
-      decoding="async"
-      class="h-full w-auto max-w-full object-contain"
-    />
-  );
-
-  // The wrapper enforces a concrete height; adjust h-12/md:h-16 if you want bigger logos.
-  const Wrapper = ({ children }: any) => (
-    <div class="h-12 md:h-16 flex items-center justify-center">{children}</div>
-  );
-
-  return p.data.url ? (
-    <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
-      <Wrapper>{img}</Wrapper>
-    </a>
-  ) : (
-    <Wrapper>{img}</Wrapper>
-  );
-}
+const gridClasses =
+  "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center";
+const boxClasses = "h-12 md:h-16 flex items-center justify-center"; // <- ensures non-zero height
+const imgClasses = "h-full w-auto max-w-full object-contain";
 ---
-
-{affiliates.length > 0 && (
-  <>
+{affiliates.length > 0 ? (
+  <section>
     <div class="mb-3 mt-1 flex items-center gap-3">
       <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-600">Affiliations</h3>
       <div class="h-px flex-1 bg-gray-200"></div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center">
-      {affiliates.map((p) => <LogoBox p={p} />)}
+    <div class={gridClasses}>
+      {affiliates.map((p) => (
+        <div class={boxClasses}>
+          {p.data.url ? (
+            <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
+              <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+            </a>
+          ) : (
+            <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+          )}
+        </div>
+      ))}
     </div>
 
-    <div class="my-8 h-px bg-gray-200" />
-  </>
-)}
+    <div class="my-8 h-px bg-gray-200"></div>
+  </section>
+) : null}
 
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center">
-  {others.map((p) => <LogoBox p={p} />)}
-</div>
+<section>
+  <div class={gridClasses}>
+    {others.map((p) => (
+      <div class={boxClasses}>
+        {p.data.url ? (
+          <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
+            <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+          </a>
+        ) : (
+          <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+        )}
+      </div>
+    ))}
+  </div>
+</section>
