@@ -1,0 +1,22 @@
+---
+prefix: Dr.
+name: Mohammad Haider Ali Khan
+slug: mohammad-haider-ali-khan
+role: Senior Research Associate @ UNSW | PhD in Chemical Engineering | Renewable
+  Fuels and Green Mineral Value Chain Specialist
+photo: /uploads/1581640083098.jpg
+email: muhammadhaiderali.khan@unsw.edu.au
+linkedin: https://www.linkedin.com/in/mhaiderkhan/
+longSummary: Haider is a Postdoctoral Research Associate at the Particles and
+  Catalysis Research Group, that is part of the School of Chemical Engineering
+  at University of New South Wales (UNSW). He is also affiliated with the
+  Australian Research Council Training Centre for the Global Hydrogen Economy
+  (GlobH2E) and the UNSW School of Minerals and Energy Resource Engineering
+  (MERA). His research is focused on technoeconomic analysis of incumbent and
+  emerging Power to X technologies. The research has yielded in development of
+  several open-source modelling and costing tools to assist research, industry,
+  and governments in establishing their Power to X portfolios. In parallel,
+  Haider has and is actively leading several industry and government led studies
+  on commercial deployment and scale of Power to X projects in Australia and
+  beyond.
+---
