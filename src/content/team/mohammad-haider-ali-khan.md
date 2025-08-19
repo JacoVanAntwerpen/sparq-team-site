@@ -19,4 +19,7 @@ longSummary: Haider is a Postdoctoral Research Associate at the Particles and
   Haider has and is actively leading several industry and government led studies
   on commercial deployment and scale of Power to X projects in Australia and
   beyond.
+order: 2
+linkedProjects:
+  - pacific-hydrogen-strategy
 ---
