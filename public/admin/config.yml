@@ -145,13 +145,17 @@ collections:
     label: Partners
     folder: src/content/partners
     create: true
+    identifier_field: title     # <-- Explicitly use 'title' as the display identifier
     slug: "{{slug}}"
     format: frontmatter
     fields:
-      - { label: "Name", name: "title", widget: "string" }
+      - { label: "Name", name: "title", widget: "string" }     # <-- single canonical name field
       - { label: "Logo", name: "logo", widget: "image" }
       - { label: "Website", name: "url", widget: "string", required: false }
-
+      - { label: "Affiliation (toggle)", name: "affiliate", widget: "boolean", default: false, required: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
+  
+  
   # -----------------------------
   # General image bucket
   # -----------------------------
