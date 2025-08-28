@@ -49,6 +49,7 @@ completed: ""
 heroFocal: center
 collaborators:
   - map-affiliate-false-logo-uploads-irena-1-1024x383-webp-name-irena
+  - university-of-new-south-wales
 featured: true
 files:
   - label: Report A
