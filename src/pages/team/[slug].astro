@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import ProjectCard from '@components/ProjectCard.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('team');
@@ -21,45 +22,45 @@ const photo = entry.data.photo || '/uploads/avatar-placeholder.png';
 ---
 <BaseLayout title={`${name} — SPARQ`}>
   <section class="py-12">
-    <div class="mx-auto max-w-7xl px-4">
-      <div class="grid gap-10 md:grid-cols-[260px,1fr]">
-        <!-- Left: portrait + contacts -->
-        <aside class="space-y-6">
-          <img
-            src={photo}
-            alt={name}
-            class="h-56 w-56 rounded-2xl object-cover ring-1 ring-neutral-200"
-            loading="lazy"
-          />
-          <div class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-            <h1 class="text-xl font-semibold">{name}</h1>
-            {role && <p class="mt-1 text-neutral-600">{role}</p>}
-            <div class="mt-4 space-y-2 text-sm">
-              {entry.data.email && (
-                <div>
-                  <span class="text-neutral-500">Email:</span>
-                  {' '}
-                  <a class="text-blue-700" href={`mailto:${entry.data.email}`}>{entry.data.email}</a>
-                </div>
-              )}
-              {entry.data.linkedin && (
-                <div>
-                  <span class="text-neutral-500">LinkedIn:</span>
-                  {' '}
-                  <a class="text-blue-700" href={entry.data.linkedin} target="_blank" rel="noopener">
-                    View profile
-                  </a>
-                </div>
-              )}
-              {entry.data.website && (
-                <div>
-                  <span class="text-neutral-500">Website:</span>
-                  {' '}
-                  <a class="text-blue-700" href={entry.data.website} target="_blank" rel="noopener">
-                    {entry.data.website}
-                  </a>
-                </div>
-              )}
+    <div class="container mx-auto px-4">
+      <div class="grid gap-10 lg:grid-cols-[280px_1fr]">
+        <!-- Left sidebar -->
+        <aside class="lg:sticky lg:top-6 h-max">
+          <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div class="flex flex-col items-center text-center">
+              <img
+                src={photo}
+                alt={name}
+                class="h-36 w-36 rounded-full object-cover ring-1 ring-neutral-200"
+                loading="lazy"
+              />
+              <h1 class="mt-4 text-xl font-semibold">{name}</h1>
+              {role && <p class="mt-1 text-neutral-700">{role}</p>}
+
+              <div class="mt-4 space-y-2 text-sm">
+                {entry.data.email && (
+                  <div>
+                    <span class="text-neutral-500">Email:</span>{' '}
+                    <a class="text-blue-700" href={`mailto:${entry.data.email}`}>{entry.data.email}</a>
+                  </div>
+                )}
+                {entry.data.linkedin && (
+                  <div>
+                    <span class="text-neutral-500">LinkedIn:</span>{' '}
+                    <a class="text-blue-700" href={entry.data.linkedin} target="_blank" rel="noopener">
+                      View profile
+                    </a>
+                  </div>
+                )}
+                {entry.data.website && (
+                  <div>
+                    <span class="text-neutral-500">Website:</span>{' '}
+                    <a class="text-blue-700" href={entry.data.website} target="_blank" rel="noopener">
+                      {entry.data.website}
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </aside>
@@ -72,22 +73,18 @@ const photo = entry.data.photo || '/uploads/avatar-placeholder.png';
           </article>
 
           {linkedProjects.length > 0 && (
-            <div class="mt-10">
-              <h2 class="text-xl font-semibold mb-3">Projects</h2>
-              <ul class="list-disc pl-5">
-                {linkedProjects.map((p) => (
-                  <li>
-                    <a class="text-blue-700" href={`/projects/${p.slug}`}>{p.data.title}</a>
-                  </li>
-                ))}
-              </ul>
+            <div class="mt-8">
+              <h3 class="text-lg font-semibold">Linked projects</h3>
+              <div class="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {linkedProjects.map((p) => <ProjectCard project={p} />)}
+              </div>
             </div>
           )}
 
           {linkedPubs.length > 0 && (
-            <div class="mt-10">
-              <h2 class="text-xl font-semibold mb-3">Publications</h2>
-              <ul class="list-disc pl-5">
+            <div class="mt-8">
+              <h3 class="text-lg font-semibold">Linked publications</h3>
+              <ul class="mt-4 list-disc pl-5">
                 {linkedPubs.map((p) => (
                   <li>
                     <a class="text-blue-700" href={`/publications/${p.slug}`}>{p.data.title}</a>

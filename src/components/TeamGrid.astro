@@ -2,9 +2,10 @@
 import { getCollection } from 'astro:content';
 import TeamCard from './TeamCard.astro';
 
-const { limit = undefined, extraClass = '' } = Astro.props as {
+const { limit = undefined, extraClass = '', homeOnly = false } = Astro.props as {
   limit?: number;
   extraClass?: string;
+  homeOnly?: boolean;
 };
 
 let team = await getCollection('team');
@@ -15,6 +16,11 @@ team = team.sort((a, b) => {
   if (ao !== bo) return ao - bo;
   return (a.data?.name ?? '').localeCompare(b.data?.name ?? '');
 });
+
+if (homeOnly) {
+  // Default is true via schema; this preserves current behaviour until you toggle people off.
+  team = team.filter((p) => p.data?.showOnHome ?? true);
+}
 
 if (typeof limit === 'number') {
   team = team.slice(0, Math.max(0, limit));

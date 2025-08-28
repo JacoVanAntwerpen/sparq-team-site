@@ -15,24 +15,18 @@ const featured = allProjects.filter((p) => p.data.featured).slice(0, 6);
 <BaseLayout>
   <Hero />
 
-  <Section id="expertise" title="What we do" edge={true}>
+  <Section id="expertise" title="Expertise">
     <ExpertiseGrid />
   </Section>
 
-  <!-- Team panel: improved tiles + CTA -->
   <Section id="team" title="Team">
-    <TeamGrid limit={4} />
-    <div class="mt-8">
-      <a
-        href="/team"
-        class="inline-flex items-center rounded-xl border border-neutral-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-neutral-50"
-      >
-        Meet the team →
-      </a>
-    </div>
+    {/*
+      Only show members that have the new toggle enabled.
+      Team page (src/pages/team.astro) still shows everyone.
+    */}
+    <TeamGrid homeOnly={true} />
   </Section>
 
-  <!-- Featured projects: no placeholder subtitle -->
   <Section id="projects" title="Featured projects">
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {featured.map((p) => <ProjectCard project={p} />)}

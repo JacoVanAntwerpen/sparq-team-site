@@ -15,64 +15,33 @@ const numberLoose = z.preprocess(
  * Permissive URL schema (kept for places where you want real URLs):
  * - Absolute (https://...), site-relative (/path), or hash (#id)
  */
-const urlSchema = z.union([
-  z.string().url(),
-  z.string().startsWith("/"),
-  z.string().startsWith("#"),
-]);
+const urlLoose = z
+  .string()
+  .regex(
+    /^(https?:\/\/|\/|#).*/i,
+    "Must be an absolute URL (https://…), a site-relative path (/path), or a hash (#id)"
+  )
+  .optional();
 
-/** Generic strict link (used where content has been consistent) */
-const link = z.object({
-  text: z.string(),
-  href: urlSchema,
-});
-
-/** ---------- Tolerant links normalisation (strings/partials → {text, href}) ---------- */
-const linksNormalized = z.preprocess(
-  (raw) => {
-    if (raw == null) return undefined;
-    if (!Array.isArray(raw)) return undefined;
-
-    const cleaned = raw
-      .filter((item) => item != null && item !== "") // drop null/empty-string items
-      .map((item) => {
-        if (typeof item === "string") {
-          const s = item.trim();
-          if (!s) return null;
-          return { text: s, href: s };
-        }
-        if (typeof item === "object") {
-          // Accept common loose shapes and alias keys
-          const href = (item as any).href ?? (item as any).url ?? (item as any).link ?? "";
-          const text = (item as any).text ?? (href || "").toString();
-          const hrefStr = typeof href === "string" ? href.trim() : "";
-          const textStr = typeof text === "string" ? text.trim() : "";
-
-          if (!hrefStr) return null; // no usable href -> drop
-          return {
-            text: textStr || hrefStr,
-            href: hrefStr,
-          };
-        }
-        return null;
+/** Normalized link object { text, href } with tolerant href */
+const linksNormalized = z
+  .array(
+    z
+      .object({
+        label: z.string().optional(),
+        text: z.string().optional(),
+        url: urlLoose,
+        href: urlLoose,
       })
-      .filter(Boolean);
-
-    return cleaned.length ? cleaned : undefined;
-  },
-  // After preprocess, validate as strict array of required text/href strings
-  z
-    .array(
-      z.object({
-        text: z.string().min(1),
-        href: z.string().min(1),
+      .transform((v) => {
+        const text = v.label ?? v.text ?? "";
+        const href = v.href ?? v.url ?? "";
+        return { text, href };
       })
-    )
-    .optional()
-);
+  )
+  .default([]);
 
-/** ---------------- Collections ---------------- */
-
+/** Projects collection */
 const projects = defineCollection({
   type: "content",
   schema: z
@@ -93,6 +62,19 @@ const projects = defineCollection({
       // Card imagery
       tileImage: z.string().optional(),
       tileImageAlt: z.string().optional(),
+      tileImageFocus: z
+        .enum([
+          "center",
+          "top",
+          "bottom",
+          "left",
+          "right",
+          "top-left",
+          "top-right",
+          "bottom-left",
+          "bottom-right",
+        ])
+        .default("center"),
 
       // Detail page hero (kept as before)
       heroImage: z.string().optional(),
@@ -113,10 +95,10 @@ const projects = defineCollection({
         ])
         .default("center"),
 
-      // Collaborators (by partner slug)
+      // Collaborators (by partner slug) — optional, array of strings
       collaborators: z.array(z.string()).default([]),
 
-      // ✅ Tolerant links accepting legacy values; normalised to {text, href}
+      // Links normalized to {text, href}
       links: linksNormalized,
 
       // Ordering for lists (optional)
@@ -125,6 +107,7 @@ const projects = defineCollection({
     .passthrough(),
 });
 
+/** Team collection */
 const team = defineCollection({
   type: "content",
   schema: z
@@ -141,6 +124,9 @@ const team = defineCollection({
       linkedin: z.string().url().optional(),
       website: z.string().url().optional(),
 
+      // Toggle: show this person on the homepage team section
+      showOnHome: z.boolean().default(true),
+
       // Robust to "", "3", 3:
       order: numberLoose,
 
@@ -148,7 +134,8 @@ const team = defineCollection({
       linkedProjects: z.array(z.string()).default([]),
       linkedPublications: z.array(z.string()).default([]),
 
-      // Optional markdown body
+      // Optional summary and markdown body
+      longSummary: z.string().optional(),
       body: z.string().optional(),
 
       // Compatibility (some entries may have used `title`)
@@ -157,62 +144,59 @@ const team = defineCollection({
     .passthrough(),
 });
 
+/** Publications collection */
 const publications = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare "slug"; Astro provides entry.slug.
-
       title: z.string(),
-      description: z.string().optional(),
-      year: z.number().optional(),
-      authors: z.array(z.string()).optional(),
-
-      // Relaxed to accept legacy non-URL strings; "" -> undefined
-      url: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
-
-      order: z.number().optional(),
+      authors: z.array(z.string()).default([]),
+      year: numberLoose,
+      venue: z.string().optional(),
+      doi: z.string().optional(),
+      url: urlLoose,
+      pdf: urlLoose,
+      image: z.string().optional(),
+      order: numberLoose,
+      // Optional relations
+      linkedProjects: z.array(z.string()).default([]),
     })
     .passthrough(),
 });
 
+/** Resources collection */
 const resources = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare "slug"; Astro provides entry.slug.
-
       title: z.string(),
-      oneLine: z.string(),
-      summary: z.string().optional(),
-      order: z.number().optional(),
-
-      // ✅ Make Resources tolerant just like Projects
-      links: linksNormalized,
-    })
-    .passthrough(),
-});
-
-const partners = defineCollection({
-  type: "content",
-  schema: z
-    .object({
-      // Do NOT declare "slug"; Astro provides entry.slug.
-
-      name: z.string(),
-      logo: z.string(),
-      url: z.string().url().optional(),
+      url: urlLoose,
+      image: z.string().optional(),
+      desc: z.string().optional(),
       order: numberLoose,
     })
     .passthrough(),
 });
 
+/** Partners (Collaborators & Affiliates) */
+const partners = defineCollection({
+  type: "content",
+  schema: z
+    .object({
+      name: z.string(),
+      url: urlLoose,
+      logo: z.string().optional(),
+      affiliate: z.boolean().optional().default(false),
+      order: numberLoose,
+    })
+    .passthrough(),
+});
+
+/** Generic media bucket */
 const media = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare "slug"; Astro provides entry.slug.
-
       title: z.string(),
       image: z.string(),
       alt: z.string().optional(),

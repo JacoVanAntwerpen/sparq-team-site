@@ -25,24 +25,11 @@ collections:
         widget: "list"
         summary: "{{fields.type}}"
         typeKey: "type"
-        required: false
+        collapsed: true
         types:
-          - label: "Header"
-            name: "header"
-            widget: "object"
-            summary: "Header: {{fields.text}}"
-            fields:
-              - { label: "Text", name: "text", widget: "string" }
-              - label: "Level"
-                name: "level"
-                widget: "select"
-                options: ["h2", "h3", "h4"]
-                default: "h3"
-
           - label: "Paragraph"
-            name: "paragraph"
+            name: "text"
             widget: "object"
-            summary: "Paragraph"
             fields:
               - { label: "Text (Markdown)", name: "body", widget: "markdown" }
 
@@ -65,20 +52,62 @@ collections:
           - label: "Quote"
             name: "quote"
             widget: "object"
-            summary: "Quote: {{fields.text}}"
             fields:
-              - { label: "Text", name: "text", widget: "text" }
-              - { label: "Attribution", name: "attribution", widget: "string", required: false }
+              - { label: "Quote", name: "text", widget: "text" }
+              - { label: "Attribution", name: "by", widget: "string", required: false }
 
-      # Hero & metadata
-      - { label: "Featured on home", name: "featured", widget: "boolean", default: false }
-      - { label: "Order", name: "order", widget: "number", required: false }
+          - label: "Callout"
+            name: "callout"
+            widget: "object"
+            fields:
+              - { label: "Heading", name: "heading", widget: "string" }
+              - { label: "Body", name: "body", widget: "markdown" }
 
-      # Project tile imagery
+      # Card imagery
       - { label: "Tile image", name: "tileImage", widget: "image", required: false }
       - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
+      - label: "Tile image focus"
+        name: "tileImageFocus"
+        widget: "select"
+        options:
+          [
+            "center",
+            "top",
+            "bottom",
+            "left",
+            "right",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+          ]
+        default: "center"
 
-      # Linked collaborators (by slug)
+      # Detail hero
+      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
+      - label: "Hero layout"
+        name: "heroLayout"
+        widget: "select"
+        options: ["standard", "wide", "edge", "none", "aside"]
+        default: "standard"
+      - label: "Hero focal point"
+        name: "heroFocalPoint"
+        widget: "select"
+        options:
+          [
+            "center",
+            "top",
+            "bottom",
+            "left",
+            "right",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+          ]
+        default: "center"
+
+      # Linked collaborators (by slug) — optional, multiple
       - label: "Collaborators"
         name: "collaborators"
         widget: "relation"
@@ -86,9 +115,26 @@ collections:
         search_fields: ["name", "slug"]
         value_field: "{{slug}}"
         display_fields: ["name"]
+        required: false
+        multiple: true
+
+      # Links
+      - label: "Links"
+        name: "links"
+        widget: "list"
+        summary: "{{fields.text}} → {{fields.href}}"
+        fields:
+          - { label: "Text", name: "text", widget: "string" }
+          - { label: "URL", name: "href", widget: "string" }
+
+      # List ordering
+      - { label: "Order", name: "order", widget: "number", required: false }
+
+      # Featured toggle (homepage)
+      - { label: "Featured on homepage", name: "featured", widget: "boolean", default: false, required: false }
 
   # -----------------------------
-  # Team  (CHANGED: added Prefix field; added custom Slug field; slug template now uses {{fields.slug}})
+  # Team
   # -----------------------------
   - name: team
     label: Team
@@ -98,6 +144,7 @@ collections:
     format: frontmatter
     fields:
       - { label: "Name Prefix (optional)", name: "prefix", widget: "string", required: false, hint: "e.g. Dr., Prof., Ms., Mr." }
+
       - label: "Custom URL Slug"
         name: "slug"
         widget: "string"
@@ -111,8 +158,11 @@ collections:
       - { label: "Email", name: "email", widget: "string", required: false }
       - { label: "LinkedIn URL", name: "linkedin", widget: "string", required: false }
       - { label: "Website", name: "website", widget: "string", required: false }
+      - { label: "Show on home page", name: "showOnHome", widget: "boolean", required: false, default: true }
+
       - { label: "Short bio (optional)", name: "longSummary", widget: "text", required: false }
       - { label: "Body (Markdown)", name: "body", widget: "markdown", required: false }
+
       - { label: "Order", name: "order", widget: "number", required: false }
 
       - label: "Linked Projects"
@@ -122,6 +172,18 @@ collections:
         search_fields: ["title", "slug"]
         value_field: "{{slug}}"
         display_fields: ["title"]
+        required: false
+        multiple: true
+
+      - label: "Linked Publications"
+        name: "linkedPublications"
+        widget: "relation"
+        collection: "publications"
+        search_fields: ["title", "slug"]
+        value_field: "{{slug}}"
+        display_fields: ["title"]
+        required: false
+        multiple: true
 
   # -----------------------------
   # Publications
@@ -134,27 +196,42 @@ collections:
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Short description", name: "description", widget: "string", required: false }
+      - { label: "Authors (comma-separated)", name: "authors", widget: "list", summary: "{{fields.item}}", field: { label: "Author", name: "item", widget: "string" }, required: false }
       - { label: "Year", name: "year", widget: "number", required: false }
-      - { label: "Authors", name: "authors", widget: "list", required: false }
-      - { label: "DOI / URL", name: "url", widget: "string", required: false }
+      - { label: "Venue", name: "venue", widget: "string", required: false }
+      - { label: "DOI", name: "doi", widget: "string", required: false }
+      - { label: "URL", name: "url", widget: "string", required: false }
+      - { label: "PDF", name: "pdf", widget: "string", required: false }
+      - { label: "Teaser image", name: "image", widget: "image", required: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
+      - label: "Linked Projects"
+        name: "linkedProjects"
+        widget: "relation"
+        collection: "projects"
+        search_fields: ["title", "slug"]
+        value_field: "{{slug}}"
+        display_fields: ["title"]
+        required: false
+        multiple: true
 
   # -----------------------------
-  # Tools & Resources
+  # Resources
   # -----------------------------
   - name: resources
-    label: Tools & Resources
+    label: Resources
     folder: src/content/resources
     create: true
     slug: "{{slug}}"
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "One-line summary", name: "oneLine", widget: "string" }
-      - { label: "Summary (longer)", name: "summary", widget: "text", required: false }
+      - { label: "URL", name: "url", widget: "string" }
+      - { label: "Image", name: "image", widget: "image", required: false }
+      - { label: "Description", name: "desc", widget: "text", required: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
 
   # -----------------------------
-  # Partners  (UNCHANGED: still uses 'name')
+  # Collaborators & Partners
   # -----------------------------
   - name: partners
     label: Collaborators & Partners
