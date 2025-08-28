@@ -11,19 +11,13 @@ const numberLoose = z.preprocess(
   z.number().optional()
 );
 
-/**
- * Permissive URL schema (kept for places where you want real URLs):
- * - Absolute (https://...), site-relative (/path), or hash (#id)
- */
+/** Permissive URL schema */
 const urlLoose = z
   .string()
-  .regex(
-    /^(https?:\/\/|\/|#).*/i,
-    "Must be an absolute URL (https://…), a site-relative path (/path), or a hash (#id)"
-  )
+  .regex(/^(https?:\/\/|\/|#).*/i, "Must be https://, /path, or #hash")
   .optional();
 
-/** Normalized link object { text, href } with tolerant href */
+/** Normalize links to {text, href} */
 const linksNormalized = z
   .array(
     z
@@ -41,22 +35,22 @@ const linksNormalized = z
   )
   .default([]);
 
+/** Coerce string | string[] | undefined -> string[] */
+const toStringArray = z.preprocess((v) => {
+  if (v == null || v === "") return [];
+  if (Array.isArray(v)) return v;
+  return [String(v)];
+}, z.array(z.string()).default([]));
+
 /** Projects collection */
 const projects = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare "slug"; Astro provides entry.slug.
-
       title: z.string(),
       shortDescription: z.string(),
-
-      // Optional long-form markdown fallback if you don't use the builder
       longDetails: z.string().optional(),
-
-      // Content builder (kept permissive for your existing blocks)
       content: z.any().optional(),
-
       featured: z.boolean().default(false),
 
       // Card imagery
@@ -76,7 +70,7 @@ const projects = defineCollection({
         ])
         .default("center"),
 
-      // Detail page hero (kept as before)
+      // Detail page hero
       heroImage: z.string().optional(),
       heroLayout: z
         .enum(["standard", "wide", "edge", "none", "aside"])
@@ -95,13 +89,10 @@ const projects = defineCollection({
         ])
         .default("center"),
 
-      // Collaborators (by partner slug) — optional, array of strings
-      collaborators: z.array(z.string()).default([]),
+      // 🔧 Accept string or array for legacy entries
+      collaborators: toStringArray,
 
-      // Links normalized to {text, href}
       links: linksNormalized,
-
-      // Ordering for lists (optional)
       order: z.number().optional(),
     })
     .passthrough(),
@@ -112,39 +103,31 @@ const team = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare "slug"; Astro provides entry.slug.
-
       prefix: z.string().optional(),
       name: z.string(),
       role: z.string().optional(),
       photo: z.string().optional(),
       email: z.string().email().optional(),
-
-      // Strict URLs here; we can loosen later if you encounter empty strings.
       linkedin: z.string().url().optional(),
       website: z.string().url().optional(),
 
-      // Toggle: show this person on the homepage team section
+      // Homepage toggle
       showOnHome: z.boolean().default(true),
 
-      // Robust to "", "3", 3:
       order: numberLoose,
 
-      // Relations by slug/filename
-      linkedProjects: z.array(z.string()).default([]),
-      linkedPublications: z.array(z.string()).default([]),
+      // 🔧 Accept string or array for legacy entries
+      linkedProjects: toStringArray,
+      linkedPublications: toStringArray,
 
-      // Optional summary and markdown body
       longSummary: z.string().optional(),
       body: z.string().optional(),
-
-      // Compatibility (some entries may have used `title`)
       title: z.string().optional(),
     })
     .passthrough(),
 });
 
-/** Publications collection */
+/** Publications */
 const publications = defineCollection({
   type: "content",
   schema: z
@@ -158,13 +141,12 @@ const publications = defineCollection({
       pdf: urlLoose,
       image: z.string().optional(),
       order: numberLoose,
-      // Optional relations
-      linkedProjects: z.array(z.string()).default([]),
+      linkedProjects: toStringArray,
     })
     .passthrough(),
 });
 
-/** Resources collection */
+/** Resources */
 const resources = defineCollection({
   type: "content",
   schema: z
@@ -192,7 +174,7 @@ const partners = defineCollection({
     .passthrough(),
 });
 
-/** Generic media bucket */
+/** Media */
 const media = defineCollection({
   type: "content",
   schema: z
