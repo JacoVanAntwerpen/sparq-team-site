@@ -1,9 +1,7 @@
 ---
+title: Pacific Hydrogen Strategy
 shortDescription: Regional demand/supply mapping, port readiness, and export
   pathway. Underpinned by dynamic TEA and logistics models.
-heroImage: /uploads/vanuatu3-2048x1536.jpg
-heroLayout: aside
-heroFocalPoint: center
 longDetails: >-
   ## Overview
 
@@ -40,14 +38,18 @@ longDetails: >-
   Foster regional capacity in hydrogen technology, feasibility analysis, and policy development.
 
   Accelerate progress toward decarbonisation, energy security, and alignment with global net-zero goals.
+tileImage: /uploads/screenshot-2025-08-07-141022.png
+tileImageFocus: center
+heroImage: /uploads/vanuatu3-2048x1536.jpg
+heroLayout: aside
+heroFocalPoint: center
 partners:
   - ""
 completed: ""
 heroFocal: center
-title: Pacific Hydrogen Strategy
+collaborators:
+  - map-affiliate-false-logo-uploads-irena-1-1024x383-webp-name-irena
 featured: true
-tileImage: /uploads/screenshot-2025-08-07-141022.png
-collaborators: map-affiliate-false-logo-uploads-irena-1-1024x383-webp-name-irena
 files:
   - label: Report A
     file: /uploads/report-a.zip
@@ -63,4 +65,6 @@ tags: []
 links:
   - label: pacificH2strategy Project Site
     url: https://pacifich2strategy.com/
+    text: Pacific Hydrogen Strategy Website
+    href: https://pacifich2strategy.com/
 ---
