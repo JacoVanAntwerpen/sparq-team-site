@@ -1,4 +1,3 @@
-// src/content/config.ts
 import { defineCollection, z } from "astro:content";
 
 /** Helper: tolerant number that accepts "", "3", 3 -> number | undefined */
@@ -13,10 +12,8 @@ const numberLoose = z.preprocess(
 );
 
 /**
- * (Kept for potential reuse) A permissive URL schema:
+ * Permissive URL schema (kept for places where you want real URLs):
  * - Absolute (https://...), site-relative (/path), or hash (#id)
- * NOTE: We no longer enforce this inside Projects.links to stay compatible
- * with legacy content. Other places can still use it if desired.
  */
 const urlSchema = z.union([
   z.string().url(),
@@ -24,22 +21,13 @@ const urlSchema = z.union([
   z.string().startsWith("#"),
 ]);
 
-/** Generic link used in some collections (kept) */
+/** Generic strict link (used where content has been consistent) */
 const link = z.object({
   text: z.string(),
   href: urlSchema,
 });
 
-/** ---------- Projects: tolerant links normalisation ---------- */
-/**
- * Accepts legacy values in front-matter:
- * - strings: "https://example.com"  → { text: "https://example.com", href: "https://example.com" }
- * - partial objects: { href: "/doc.pdf" } → { text: "/doc.pdf", href: "/doc.pdf" }
- * - drops empty/invalid items (e.g., "", {}, { href: "" })
- *
- * We intentionally do NOT enforce URL shape here to avoid breaking content
- * that uses non-URL placeholders. Components get a consistent {text, href}.
- */
+/** ---------- Tolerant links normalisation (strings/partials → {text, href}) ---------- */
 const linksNormalized = z.preprocess(
   (raw) => {
     if (raw == null) return undefined;
@@ -54,7 +42,7 @@ const linksNormalized = z.preprocess(
           return { text: s, href: s };
         }
         if (typeof item === "object") {
-          // Read loose fields, tolerate alt keys
+          // Accept common loose shapes and alias keys
           const href = (item as any).href ?? (item as any).url ?? (item as any).link ?? "";
           const text = (item as any).text ?? (href || "").toString();
           const hrefStr = typeof href === "string" ? href.trim() : "";
@@ -149,7 +137,7 @@ const team = defineCollection({
       photo: z.string().optional(),
       email: z.string().email().optional(),
 
-      // Keep strict URL here; if you later hit empty strings, we can loosen similarly.
+      // Strict URLs here; we can loosen later if you encounter empty strings.
       linkedin: z.string().url().optional(),
       website: z.string().url().optional(),
 
@@ -199,8 +187,8 @@ const resources = defineCollection({
       summary: z.string().optional(),
       order: z.number().optional(),
 
-      // Keep this link shape (used by your UI); authors have been entering valid values here
-      links: z.array(link).default([]),
+      // ✅ Make Resources tolerant just like Projects
+      links: linksNormalized,
     })
     .passthrough(),
 });
