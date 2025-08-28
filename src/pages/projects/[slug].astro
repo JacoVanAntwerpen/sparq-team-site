@@ -14,6 +14,7 @@ const { Content } = await entry.render();
 
 const md = (s?: string) => (s ? marked.parse(s) : '');
 
+// Hero bits (keep existing behaviour)
 const heroUrl       = entry.data.heroImage as string | undefined;
 const heroLayout    = (entry.data.heroLayout as string | undefined) ?? 'standard';
 const heroFocal     = (entry.data.heroFocalPoint as string | undefined) ?? 'center';
@@ -21,8 +22,20 @@ const heroCaption   = entry.data.heroCaption as string | undefined;
 const heroCredit    = entry.data.heroCredit as string | undefined;
 const heroCreditUrl = entry.data.heroCreditUrl as string | undefined;
 
+// Existing optional blocks
 const files = (entry.data.files ?? []) as Array<{label:string,file:string}>;
-const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
+const links = (entry.data.links ?? []) as Array<{label?:string,text?:string,url?:string,href?:string}>;
+
+// 🔧 Collaborator slugs: prefer `collaborators` (new), fallback to legacy `partners`
+const collaboratorSlugs: string[] = Array.isArray(entry.data.collaborators) && entry.data.collaborators.length > 0
+  ? entry.data.collaborators as string[]
+  : (Array.isArray(entry.data.partners) ? (entry.data.partners as string[]) : []);
+
+// Resolve partner entries once
+const allPartners = await getCollection('partners');
+const partnersToShow = allPartners
+  .filter(p => collaboratorSlugs.includes(p.slug))
+  .sort((a,b) => (a.data.order ?? 9999) - (b.data.order ?? 9999));
 ---
 
 <BaseLayout title={`${entry.data.title} — SPARQ Team`}>
@@ -48,24 +61,40 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
           </figure>
         )}
 
-        {/* WIDE */}
-        {heroLayout === 'wide' && (
-          <figure class="mb-8 -mx-4 md:mx-0">
-            <img src={heroUrl} alt={entry.data.title} class="w-[calc(100%+2rem)] md:w-full max-w-none rounded-none md:rounded-2xl object-cover" style={`object-position:${heroFocal}`} loading="eager" />
+        {/* WIDE / EDGE */}
+        {(heroLayout === 'wide' || heroLayout === 'edge') && (
+          <figure class={`mb-8 ${heroLayout === 'edge' ? 'mx-[-1rem] md:mx-[-2rem]' : ''}`}>
+            <img
+              src={heroUrl}
+              alt={entry.data.title}
+              class="w-full rounded-2xl object-cover"
+              style={`object-position:${heroFocal}`}
+              loading="eager"
+            />
+            {(heroCredit || heroCreditUrl) && (
+              <figcaption class="mt-2 text-sm text-neutral-600">
+                Photo:{' '}
+                {heroCreditUrl ? (
+                  <a class="text-blue-700 underline" href={heroCreditUrl} target="_blank">{heroCredit || heroCreditUrl}</a>
+                ) : (
+                  heroCredit
+                )}
+              </figcaption>
+            )}
+            {heroCaption && <div class="text-sm text-neutral-700 mt-1">{heroCaption}</div>}
           </figure>
         )}
 
-        {/* EDGE */}
-        {heroLayout === 'edge' && (
-          <figure class="mb-8">
-            <img src={heroUrl} alt={entry.data.title} class="w-screen max-w-none relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] object-cover" style={`object-position:${heroFocal}`} loading="eager" />
-          </figure>
-        )}
-
-        {/* ✅ ASIDE — float right on md+ so the content wraps */}
+        {/* ASIDE — float right on md+ so the content wraps */}
         {heroLayout === 'aside' && (
           <figure class="mb-6 md:float-right md:ml-6 md:mb-6 md:w-[45%]">
-            <img src={heroUrl} alt={entry.data.title} class="w-full rounded-2xl shadow-sm object-cover" style={`object-position:${heroFocal}`} loading="eager" />
+            <img
+              src={heroUrl}
+              alt={entry.data.title}
+              class="w-full rounded-2xl object-cover"
+              style={`object-position:${heroFocal}`}
+              loading="eager"
+            />
             {(heroCredit || heroCreditUrl) && (
               <figcaption class="mt-2 text-sm text-neutral-600">
                 Photo:{' '}
@@ -100,9 +129,13 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
       <div class="mt-10">
         <h3 class="font-semibold mb-2">Links</h3>
         <ul class="list-disc pl-5">
-          {links.map((l) => (
-            <li><a class="text-blue-700 underline" href={l.url} target="_blank">{l.label}</a></li>
-          ))}
+          {links.map((l) => {
+            const text = l.text ?? l.label ?? l.url ?? l.href ?? 'Link';
+            const href = l.href ?? l.url ?? '#';
+            return (
+              <li><a class="text-blue-700 underline" href={href} target="_blank" rel="noopener">{text}</a></li>
+            );
+          })}
         </ul>
       </div>
     )}
@@ -119,24 +152,26 @@ const links = (entry.data.links ?? []) as Array<{label:string,url:string}>;
       </div>
     )}
 
-    {/* PARTNERS */}
-    {Array.isArray(entry.data.partners) && entry.data.partners.length > 0 && (
+    {/* COLLABORATORS & PARTNERS */}
+    {partnersToShow.length > 0 && (
       <div class="mt-10">
         <h3 class="font-semibold mb-3">Collaborators & partners</h3>
-        {
-          (await getCollection('partners'))
-            .filter(p => entry.data.partners.includes(p.slug))
-            .sort((a,b) => (a.data.order ?? 9999) - (b.data.order ?? 9999))
-            .map(p => (
-              <a href={p.data.url || '#'} target={p.data.url ? '_blank' : undefined} class="inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white h-16 w-40 mr-3 mb-3">
-                {p.data.logo ? (
-                  <img src={p.data.logo} alt={p.data.name} class="max-h-10 object-contain" loading="lazy" />
-                ) : (
-                  <span class="text-neutral-600 font-semibold">{p.data.name}</span>
-                )}
-              </a>
-            ))
-        }
+        <div class="flex flex-wrap">
+          {partnersToShow.map(p => (
+            <a
+              href={p.data.url || '#'}
+              target={p.data.url ? '_blank' : undefined}
+              rel={p.data.url ? 'noopener' : undefined}
+              class="rounded-xl border border-neutral-200 bg-white h-16 w-40 mr-3 mb-3 flex items-center justify-center shadow-sm hover:shadow"
+            >
+              {p.data.logo ? (
+                <img src={p.data.logo} alt={p.data.name} class="max-h-10 object-contain" loading="lazy" />
+              ) : (
+                <span class="text-neutral-600 font-semibold">{p.data.name}</span>
+              )}
+            </a>
+          ))}
+        </div>
       </div>
     )}
   </Section>

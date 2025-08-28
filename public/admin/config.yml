@@ -27,9 +27,22 @@ collections:
         typeKey: "type"
         collapsed: true
         types:
-          - label: "Paragraph"
-            name: "text"
+          - label: "Header"
+            name: "header"
             widget: "object"
+            summary: "Header: {{fields.text}}"
+            fields:
+              - { label: "Text", name: "text", widget: "string" }
+              - label: "Level"
+                name: "level"
+                widget: "select"
+                options: ["h2", "h3", "h4"]
+                default: "h3"
+
+          - label: "Paragraph"
+            name: "paragraph"
+            widget: "object"
+            summary: "Paragraph"
             fields:
               - { label: "Text (Markdown)", name: "body", widget: "markdown" }
 
@@ -52,18 +65,12 @@ collections:
           - label: "Quote"
             name: "quote"
             widget: "object"
+            summary: "Quote: {{fields.text}}"
             fields:
-              - { label: "Quote", name: "text", widget: "text" }
-              - { label: "Attribution", name: "by", widget: "string", required: false }
+              - { label: "Text", name: "text", widget: "text" }
+              - { label: "Attribution", name: "attribution", widget: "string", required: false }
 
-          - label: "Callout"
-            name: "callout"
-            widget: "object"
-            fields:
-              - { label: "Heading", name: "heading", widget: "string" }
-              - { label: "Body", name: "body", widget: "markdown" }
-
-      # Card imagery
+      # Hero & metadata
       - { label: "Tile image", name: "tileImage", widget: "image", required: false }
       - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
       - label: "Tile image focus"
@@ -82,8 +89,6 @@ collections:
             "bottom-right",
           ]
         default: "center"
-
-      # Detail hero
       - { label: "Hero image", name: "heroImage", widget: "image", required: false }
       - label: "Hero layout"
         name: "heroLayout"
@@ -107,16 +112,17 @@ collections:
           ]
         default: "center"
 
-      # Linked collaborators (by slug) — optional, multiple
+      # Collaborators (partners) — optional, multiple; show many options
       - label: "Collaborators"
         name: "collaborators"
         widget: "relation"
         collection: "partners"
-        search_fields: ["name", "slug"]
+        search_fields: ["name"]
         value_field: "{{slug}}"
         display_fields: ["name"]
         required: false
         multiple: true
+        options_length: 1000
 
       # Links
       - label: "Links"
@@ -127,10 +133,7 @@ collections:
           - { label: "Text", name: "text", widget: "string" }
           - { label: "URL", name: "href", widget: "string" }
 
-      # List ordering
       - { label: "Order", name: "order", widget: "number", required: false }
-
-      # Featured toggle (homepage)
       - { label: "Featured on homepage", name: "featured", widget: "boolean", default: false, required: false }
 
   # -----------------------------
@@ -143,8 +146,7 @@ collections:
     slug: "{{fields.slug}}"
     format: frontmatter
     fields:
-      - { label: "Name Prefix (optional)", name: "prefix", widget: "string", required: false, hint: "e.g. Dr., Prof., Ms., Mr." }
-
+      - { label: "Name Prefix (optional)", name: "prefix", widget: "string", required: false }
       - label: "Custom URL Slug"
         name: "slug"
         widget: "string"
@@ -162,28 +164,29 @@ collections:
 
       - { label: "Short bio (optional)", name: "longSummary", widget: "text", required: false }
       - { label: "Body (Markdown)", name: "body", widget: "markdown", required: false }
-
       - { label: "Order", name: "order", widget: "number", required: false }
 
       - label: "Linked Projects"
         name: "linkedProjects"
         widget: "relation"
         collection: "projects"
-        search_fields: ["title", "slug"]
+        search_fields: ["title"]
         value_field: "{{slug}}"
         display_fields: ["title"]
         required: false
         multiple: true
+        options_length: 1000
 
       - label: "Linked Publications"
         name: "linkedPublications"
         widget: "relation"
         collection: "publications"
-        search_fields: ["title", "slug"]
+        search_fields: ["title"]
         value_field: "{{slug}}"
         display_fields: ["title"]
         required: false
         multiple: true
+        options_length: 1000
 
   # -----------------------------
   # Publications
@@ -196,7 +199,11 @@ collections:
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Authors (comma-separated)", name: "authors", widget: "list", summary: "{{fields.item}}", field: { label: "Author", name: "item", widget: "string" }, required: false }
+      - label: "Authors"
+        name: "authors"
+        widget: "list"
+        field: { label: "Author", name: "item", widget: "string" }
+        required: false
       - { label: "Year", name: "year", widget: "number", required: false }
       - { label: "Venue", name: "venue", widget: "string", required: false }
       - { label: "DOI", name: "doi", widget: "string", required: false }
@@ -208,11 +215,12 @@ collections:
         name: "linkedProjects"
         widget: "relation"
         collection: "projects"
-        search_fields: ["title", "slug"]
+        search_fields: ["title"]
         value_field: "{{slug}}"
         display_fields: ["title"]
         required: false
         multiple: true
+        options_length: 1000
 
   # -----------------------------
   # Resources
