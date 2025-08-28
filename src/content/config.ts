@@ -2,7 +2,7 @@
 import { defineCollection, z } from "astro:content";
 
 /**
- * Permissive URL schema:
+ * Permissive URL schema helper (kept here if you want it later):
  * - Absolute URLs: https://...
  * - Site-relative paths: /path
  * - Hash anchors: #section
@@ -14,7 +14,7 @@ const urlSchema = z.union([
 ]);
 
 /**
- * Link union with basic shape used across collections.
+ * Generic link shape (some collections use this).
  */
 const link = z.object({
   text: z.string(),
@@ -26,7 +26,7 @@ const projects = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro reserves it.
+      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
 
       title: z.string(),
       shortDescription: z.string(),
@@ -82,12 +82,17 @@ const team = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro reserves it.
+      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+
       prefix: z.string().optional(),
       name: z.string(),
       role: z.string().optional(),
       photo: z.string().optional(),
       email: z.string().email().optional(),
+
+      // Allow standard URLs; keep as-is if your content already uses https://...
+      // (If you ever see builds fail due to empty strings, we can add the same
+      // empty-string-to-undefined preprocess here too.)
       linkedin: z.string().url().optional(),
       website: z.string().url().optional(),
 
@@ -120,12 +125,20 @@ const publications = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro reserves it.
+      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+
       title: z.string(),
       description: z.string().optional(),
       year: z.number().optional(),
       authors: z.array(z.string()).optional(),
-      url: z.string().url().optional(),
+
+      // ✅ Relaxed: accept any string; treat "" as undefined.
+      // This preserves legacy entries that have bare domains, DOIs, or placeholders.
+      url: z.preprocess(
+        (v) => (v === "" ? undefined : v),
+        z.string().optional()
+      ),
+
       order: z.number().optional(),
     })
     .passthrough(),
@@ -136,7 +149,8 @@ const resources = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro reserves it.
+      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+
       title: z.string(),
       oneLine: z.string(),
       summary: z.string().optional(),
@@ -151,12 +165,13 @@ const partners = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro reserves it.
+      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+
       name: z.string(),
       logo: z.string(), // /uploads/...
       url: z.string().url().optional(),
 
-      // ⚠️ Same robustness for partners just in case
+      // ⚠️ Same robustness for partners.order just in case:
       order: z.preprocess(
         (v) =>
           v === "" || v == null
@@ -175,7 +190,8 @@ const media = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro reserves it.
+      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+
       title: z.string(),
       image: z.string(), // /uploads/...
       alt: z.string().optional(),
