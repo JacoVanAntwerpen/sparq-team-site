@@ -15,6 +15,7 @@ const profileUrl = `/team/${person.slug}`;
         alt={displayName}
         class="h-36 w-36 rounded-full object-cover ring-1 ring-neutral-200"
         loading="lazy"
+        decoding="async"
       />
       <h3 class="mt-4 text-lg font-semibold">{displayName}</h3>
       {role && <p class="mt-1 text-sm text-neutral-600">{role}</p>}

@@ -36,14 +36,16 @@ collections:
               - label: "Level"
                 name: "level"
                 widget: "select"
-                options: [h2, h3, h4]
-                default: h2
+                options: ["h2", "h3", "h4"]
+                default: "h3"
+
           - label: "Paragraph"
             name: "paragraph"
             widget: "object"
             summary: "Paragraph"
             fields:
-              - { label: "Text (Markdown)", name: "text", widget: "markdown" }
+              - { label: "Text (Markdown)", name: "body", widget: "markdown" }
+
           - label: "Image"
             name: "image"
             widget: "object"
@@ -51,44 +53,59 @@ collections:
             fields:
               - { label: "Image", name: "src", widget: "image" }
               - { label: "Alt text", name: "alt", widget: "string" }
-              - { label: "Caption (optional)", name: "caption", widget: "string", required: false }
+              - { label: "Caption", name: "caption", widget: "string", required: false }
+              - { label: "Credit (text)", name: "credit", widget: "string", required: false }
+              - { label: "Credit URL", name: "creditUrl", widget: "string", required: false }
+              - label: "Alignment"
+                name: "align"
+                widget: "select"
+                options: ["left", "center", "right"]
+                default: "center"
 
-      - label: "Linked Media"
-        name: "media"
+          - label: "Quote"
+            name: "quote"
+            widget: "object"
+            summary: "Quote: {{fields.text}}"
+            fields:
+              - { label: "Text", name: "text", widget: "text" }
+              - { label: "Attribution", name: "attribution", widget: "string", required: false }
+
+      # Hero & metadata
+      - { label: "Featured on home", name: "featured", widget: "boolean", default: false }
+      - { label: "Order", name: "order", widget: "number", required: false }
+
+      # Project tile imagery
+      - { label: "Tile image", name: "tileImage", widget: "image", required: false }
+      - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
+
+      # Linked collaborators (by slug)
+      - label: "Collaborators"
+        name: "collaborators"
         widget: "relation"
-        collection: "media"
-        search_fields: ["title", "alt"]
-        value_field: "{{filename}}"
-        display_fields: ["title"]
-        multiple: true
-        required: false
+        collection: "partners"
+        search_fields: ["name", "slug"]
+        value_field: "{{slug}}"
+        display_fields: ["name"]
 
   # -----------------------------
-  # Team
+  # Team  (CHANGED: added Prefix field; added custom Slug field; slug template now uses {{fields.slug}})
   # -----------------------------
   - name: team
     label: Team
     folder: src/content/team
     create: true
-    identifier_field: name
-    # Use the frontmatter 'slug' field for filenames. When a field name conflicts
-    # with the built-in {{slug}} token, reference it via {{fields.slug}}.
-    # (Decap CMS supports field references in slug templates.)
     slug: "{{fields.slug}}"
     format: frontmatter
     fields:
       - { label: "Name Prefix (optional)", name: "prefix", widget: "string", required: false, hint: "e.g. Dr., Prof., Ms., Mr." }
-      - { label: "Full name", name: "name", widget: "string" }
-
-      # Editors can view/edit an explicit slug used for the filename and route.
-      # Validation prevents spaces/uppercase and enforces kebab-case.
       - label: "Custom URL Slug"
         name: "slug"
         widget: "string"
         required: true
-        hint: "Lowercase, use hyphens (e.g. rahman-daiyan)."
-        pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', "Use lowercase letters, numbers, and hyphens only"]
+        hint: "Lowercase, use hyphens (e.g. rahman-daiyan)"
+        pattern: [ "^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use lowercase letters, numbers, and hyphens only" ]
 
+      - { label: "Full name", name: "name", widget: "string" }
       - { label: "Role/Title", name: "role", widget: "string", required: false }
       - { label: "Headshot", name: "photo", widget: "image", required: false }
       - { label: "Email", name: "email", widget: "string", required: false }
@@ -105,8 +122,6 @@ collections:
         search_fields: ["title", "slug"]
         value_field: "{{slug}}"
         display_fields: ["title"]
-        multiple: true
-        required: false
 
   # -----------------------------
   # Publications
@@ -139,23 +154,21 @@ collections:
       - { label: "Summary (longer)", name: "summary", widget: "text", required: false }
 
   # -----------------------------
-  # Partners
+  # Partners  (UNCHANGED: still uses 'name')
   # -----------------------------
   - name: partners
-    label: Partners
+    label: Collaborators & Partners
     folder: src/content/partners
     create: true
-    identifier_field: title     # <-- Explicitly use 'title' as the display identifier
     slug: "{{slug}}"
     format: frontmatter
     fields:
-      - { label: "Name", name: "title", widget: "string" }     # <-- single canonical name field
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Website URL", name: "url", widget: "string", required: false }
       - { label: "Logo", name: "logo", widget: "image" }
-      - { label: "Website", name: "url", widget: "string", required: false }
       - { label: "Affiliation (toggle)", name: "affiliate", widget: "boolean", default: false, required: false }
       - { label: "Order", name: "order", widget: "number", required: false }
-  
-  
+
   # -----------------------------
   # General image bucket
   # -----------------------------
