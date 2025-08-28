@@ -1,11 +1,22 @@
 // src/content/config.ts
 import { defineCollection, z } from "astro:content";
 
+/** Helper: tolerant number that accepts "", "3", 3 -> number | undefined */
+const numberLoose = z.preprocess(
+  (v) =>
+    v === "" || v == null
+      ? undefined
+      : typeof v === "string"
+      ? Number(v)
+      : v,
+  z.number().optional()
+);
+
 /**
- * Permissive URL schema helper (kept here if you want it later):
- * - Absolute URLs: https://...
- * - Site-relative paths: /path
- * - Hash anchors: #section
+ * (Kept for potential reuse) A permissive URL schema:
+ * - Absolute (https://...), site-relative (/path), or hash (#id)
+ * NOTE: We no longer enforce this inside Projects.links to stay compatible
+ * with legacy content. Other places can still use it if desired.
  */
 const urlSchema = z.union([
   z.string().url(),
@@ -13,20 +24,72 @@ const urlSchema = z.union([
   z.string().startsWith("#"),
 ]);
 
-/**
- * Generic link shape (some collections use this).
- */
+/** Generic link used in some collections (kept) */
 const link = z.object({
   text: z.string(),
   href: urlSchema,
 });
 
-/** Projects collection */
+/** ---------- Projects: tolerant links normalisation ---------- */
+/**
+ * Accepts legacy values in front-matter:
+ * - strings: "https://example.com"  → { text: "https://example.com", href: "https://example.com" }
+ * - partial objects: { href: "/doc.pdf" } → { text: "/doc.pdf", href: "/doc.pdf" }
+ * - drops empty/invalid items (e.g., "", {}, { href: "" })
+ *
+ * We intentionally do NOT enforce URL shape here to avoid breaking content
+ * that uses non-URL placeholders. Components get a consistent {text, href}.
+ */
+const linksNormalized = z.preprocess(
+  (raw) => {
+    if (raw == null) return undefined;
+    if (!Array.isArray(raw)) return undefined;
+
+    const cleaned = raw
+      .filter((item) => item != null && item !== "") // drop null/empty-string items
+      .map((item) => {
+        if (typeof item === "string") {
+          const s = item.trim();
+          if (!s) return null;
+          return { text: s, href: s };
+        }
+        if (typeof item === "object") {
+          // Read loose fields, tolerate alt keys
+          const href = (item as any).href ?? (item as any).url ?? (item as any).link ?? "";
+          const text = (item as any).text ?? (href || "").toString();
+          const hrefStr = typeof href === "string" ? href.trim() : "";
+          const textStr = typeof text === "string" ? text.trim() : "";
+
+          if (!hrefStr) return null; // no usable href -> drop
+          return {
+            text: textStr || hrefStr,
+            href: hrefStr,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    return cleaned.length ? cleaned : undefined;
+  },
+  // After preprocess, validate as strict array of required text/href strings
+  z
+    .array(
+      z.object({
+        text: z.string().min(1),
+        href: z.string().min(1),
+      })
+    )
+    .optional()
+);
+
+/** ---------------- Collections ---------------- */
+
 const projects = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+      // Do NOT declare "slug"; Astro provides entry.slug.
 
       title: z.string(),
       shortDescription: z.string(),
@@ -43,14 +106,11 @@ const projects = defineCollection({
       tileImage: z.string().optional(),
       tileImageAlt: z.string().optional(),
 
-      // Hero configuration for detail page
+      // Detail page hero (kept as before)
       heroImage: z.string().optional(),
-
-      // NOTE: includes "aside" to support existing content
       heroLayout: z
         .enum(["standard", "wide", "edge", "none", "aside"])
         .default("standard"),
-
       heroFocalPoint: z
         .enum([
           "center",
@@ -68,8 +128,8 @@ const projects = defineCollection({
       // Collaborators (by partner slug)
       collaborators: z.array(z.string()).default([]),
 
-      // Links shown on project pages
-      links: z.array(link).default([]),
+      // ✅ Tolerant links accepting legacy values; normalised to {text, href}
+      links: linksNormalized,
 
       // Ordering for lists (optional)
       order: z.number().optional(),
@@ -77,12 +137,11 @@ const projects = defineCollection({
     .passthrough(),
 });
 
-/** Team collection */
 const team = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+      // Do NOT declare "slug"; Astro provides entry.slug.
 
       prefix: z.string().optional(),
       name: z.string(),
@@ -90,22 +149,12 @@ const team = defineCollection({
       photo: z.string().optional(),
       email: z.string().email().optional(),
 
-      // Allow standard URLs; keep as-is if your content already uses https://...
-      // (If you ever see builds fail due to empty strings, we can add the same
-      // empty-string-to-undefined preprocess here too.)
+      // Keep strict URL here; if you later hit empty strings, we can loosen similarly.
       linkedin: z.string().url().optional(),
       website: z.string().url().optional(),
 
-      // ⚠️ Robust to CMS writing "" or "3" for order:
-      order: z.preprocess(
-        (v) =>
-          v === "" || v == null
-            ? undefined
-            : typeof v === "string"
-            ? Number(v)
-            : v,
-        z.number().optional()
-      ),
+      // Robust to "", "3", 3:
+      order: numberLoose,
 
       // Relations by slug/filename
       linkedProjects: z.array(z.string()).default([]),
@@ -120,80 +169,64 @@ const team = defineCollection({
     .passthrough(),
 });
 
-/** Publications collection */
 const publications = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+      // Do NOT declare "slug"; Astro provides entry.slug.
 
       title: z.string(),
       description: z.string().optional(),
       year: z.number().optional(),
       authors: z.array(z.string()).optional(),
 
-      // ✅ Relaxed: accept any string; treat "" as undefined.
-      // This preserves legacy entries that have bare domains, DOIs, or placeholders.
-      url: z.preprocess(
-        (v) => (v === "" ? undefined : v),
-        z.string().optional()
-      ),
+      // Relaxed to accept legacy non-URL strings; "" -> undefined
+      url: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
 
       order: z.number().optional(),
     })
     .passthrough(),
 });
 
-/** Resources collection */
 const resources = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+      // Do NOT declare "slug"; Astro provides entry.slug.
 
       title: z.string(),
       oneLine: z.string(),
       summary: z.string().optional(),
       order: z.number().optional(),
+
+      // Keep this link shape (used by your UI); authors have been entering valid values here
       links: z.array(link).default([]),
     })
     .passthrough(),
 });
 
-/** Partners collection */
 const partners = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+      // Do NOT declare "slug"; Astro provides entry.slug.
 
       name: z.string(),
-      logo: z.string(), // /uploads/...
+      logo: z.string(),
       url: z.string().url().optional(),
-
-      // ⚠️ Same robustness for partners.order just in case:
-      order: z.preprocess(
-        (v) =>
-          v === "" || v == null
-            ? undefined
-            : typeof v === "string"
-            ? Number(v)
-            : v,
-        z.number().optional()
-      ),
+      order: numberLoose,
     })
     .passthrough(),
 });
 
-/** General media collection */
 const media = defineCollection({
   type: "content",
   schema: z
     .object({
-      // Do NOT declare `slug` here; Astro provides entry.slug for routing.
+      // Do NOT declare "slug"; Astro provides entry.slug.
 
       title: z.string(),
-      image: z.string(), // /uploads/...
+      image: z.string(),
       alt: z.string().optional(),
       credit: z.string().optional(),
       creditUrl: z.string().url().optional(),
