@@ -1,12 +1,13 @@
 ---
 prefix: Dr.
-name: Mohammad Haider Ali Khan
 slug: mohammad-haider-ali-khan
-role: Senior Research Associate @ UNSW | PhD in Chemical Engineering | Renewable
-  Fuels and Green Mineral Value Chain Specialist
+name: Mohammad Haider Ali Khan
+role: Research Associate @ UNSW | PhD in Chemical Engineering | Renewable Fuels
+  and Green Mineral Value Chain Specialist
 photo: /uploads/1581640083098.jpg
 email: muhammadhaiderali.khan@unsw.edu.au
 linkedin: https://www.linkedin.com/in/mhaiderkhan/
+showOnHome: true
 longSummary: Haider is a Postdoctoral Research Associate at the Particles and
   Catalysis Research Group, that is part of the School of Chemical Engineering
   at University of New South Wales (UNSW). He is also affiliated with the
@@ -22,4 +23,5 @@ longSummary: Haider is a Postdoctoral Research Associate at the Particles and
 order: 2
 linkedProjects:
   - pacific-hydrogen-strategy
+  - nsw-power-to-x-industry-feasibility-pre-feasibility-studies
 ---
