@@ -80,6 +80,6 @@ files:
   - label: "NSW Power to X Industry Pre-feasibility Study: A Roadmap for a P2X
       economy in NSW"
     file: /uploads/nsw-p2x-industry-pre-feasibility-study.pdf
-order: 2
+order: 4
 featured: true
 ---
