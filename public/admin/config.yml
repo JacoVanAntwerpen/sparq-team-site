@@ -132,6 +132,17 @@ collections:
         fields:
           - { label: "Text", name: "text", widget: "string" }
           - { label: "URL", name: "href", widget: "string" }
+      
+      # Downloads
+      - label: "Files"
+        name: "files"
+        widget: "list"
+        required: false
+        collapsed: true
+        summary: "{{fields.label}} — {{fields.file}}"
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "File",  name: "file",  widget: "file", media_library: { allow_multiple: false } }
 
       - { label: "Order", name: "order", widget: "number", required: false }
       - { label: "Featured on homepage", name: "featured", widget: "boolean", default: false, required: false }
