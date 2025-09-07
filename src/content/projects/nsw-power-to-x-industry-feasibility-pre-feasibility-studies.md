@@ -61,14 +61,25 @@ longDetails: >-
   * Offer transparency and open tools to empower investors, researchers, and policymakers.
 tileImage: /uploads/nsw-p2x-tile.png
 tileImageFocus: center
-heroImage: /uploads/blog-featured-images-18-jpg-nsw-p2x.webp
+heroImage: /uploads/nsw-p2x-tile.png
 heroLayout: standard
 heroFocalPoint: center
+collaborators:
+  - map-affiliate-false-logo-uploads-logo-svg-name-nsw-government
+  - university-of-new-south-wales
 links:
   - text: NSW Powerfuel Value Chain Tool
     href: https://nswp2xtool.pages.dev/
   - text: Chief Scientist & Engineer Site
     href: https://www.chiefscientist.nsw.gov.au/industry-development/reports/power-to-x
+files:
+  - label: NSW Power-to-X Industry Feasibility Study
+    file: /uploads/nsw-p2x-industry-feasibility-study_web.pdf
+  - label: NSW Power-to-X Industry Feasibility Study Appendix
+    file: /uploads/nsw-p2x-2.0-report_appendix.pdf
+  - label: "NSW Power to X Industry Pre-feasibility Study: A Roadmap for a P2X
+      economy in NSW"
+    file: /uploads/nsw-p2x-industry-pre-feasibility-study.pdf
 order: 2
 featured: true
 ---
