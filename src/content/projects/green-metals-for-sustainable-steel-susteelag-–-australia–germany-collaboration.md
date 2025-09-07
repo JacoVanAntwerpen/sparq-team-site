@@ -62,6 +62,6 @@ files:
     file: /uploads/report-2_technological-pathways-for-a-green-iron-and-green-steel-supply-chain_v1.pdf
   - label: Roadmapping State of Play Report Draft
     file: /uploads/green-metals-for-sustainable-steel-state-of-play-roadmapping-report_draft.pdf
-order: ""
+order: 2
 featured: true
 ---
