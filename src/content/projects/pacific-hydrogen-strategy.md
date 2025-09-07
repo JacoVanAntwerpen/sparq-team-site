@@ -1,5 +1,4 @@
 ---
-title: Pacific Hydrogen Strategy
 shortDescription: Regional demand/supply mapping, port readiness, and export
   pathway. Underpinned by dynamic TEA and logistics models.
 longDetails: >-
@@ -47,10 +46,15 @@ partners:
   - ""
 completed: ""
 heroFocal: center
+title: Pacific Hydrogen Strategy
 collaborators:
   - map-affiliate-false-logo-uploads-irena-1-1024x383-webp-name-irena
   - university-of-new-south-wales
-featured: true
+links:
+  - label: pacificH2strategy Project Site
+    url: https://pacifich2strategy.com/
+    text: Pacific Hydrogen Strategy Website
+    href: https://pacifich2strategy.com/
 files:
   - label: Report A
     file: /uploads/report-a.zip
@@ -62,10 +66,7 @@ files:
     file: /uploads/report-d_a-hydrogen-roadmap-for-the-pacific_draft-for-consultation.pdf
   - label: Open-source tools
     file: /uploads/pacific-hydrogen-and-derivatives-tools.zip
+order: 5
+featured: true
 tags: []
-links:
-  - label: pacificH2strategy Project Site
-    url: https://pacifich2strategy.com/
-    text: Pacific Hydrogen Strategy Website
-    href: https://pacifich2strategy.com/
 ---
