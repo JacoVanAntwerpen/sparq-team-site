@@ -62,7 +62,7 @@ longDetails: >-
 tileImage: /uploads/nsw-p2x-tile.png
 tileImageFocus: center
 heroImage: /uploads/nsw-p2x-tile.png
-heroLayout: standard
+heroLayout: edge
 heroFocalPoint: center
 collaborators:
   - map-affiliate-false-logo-uploads-logo-svg-name-nsw-government
