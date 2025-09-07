@@ -67,7 +67,7 @@ longDetails: >-
 
   **Outcomes:** Recommendations now informing bilateral HyGATE program and ongoing Australia–Germany hydrogen collaboration.
 tileImage: /uploads/aus-sunshine-to-eu_png.avif
-tileImageFocus: center
+tileImageFocus: left
 heroImage: /uploads/aus-sunshine-to-eu_png.avif
 heroLayout: aside
 heroFocalPoint: center
