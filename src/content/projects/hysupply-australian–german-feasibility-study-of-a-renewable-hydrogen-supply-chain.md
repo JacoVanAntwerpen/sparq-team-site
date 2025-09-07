@@ -71,6 +71,13 @@ tileImageFocus: center
 heroImage: /uploads/aus-sunshine-to-eu_png.avif
 heroLayout: aside
 heroFocalPoint: center
+collaborators:
+  - university-of-new-south-wales
+  - map-affiliate-false-name-deloitte-logo-uploads-deloitte-png
+  - map-affiliate-false-name-german-ministry-of-education-and-research-logo-uploads-bmbf-logo-en-png
+  - map-affiliate-false-name-bdi-logo-uploads-bdi-logo-png
+  - map-affiliate-false-name-dfat-logo-uploads-dfat-stacked-black-png
+  - map-affiliate-true-logo-uploads-globh2e_logo_horizontal-png-name-globh2e
 links:
   - text: GlobeH2E HySupply Page
     href: https://www.globh2e.org.au/hysupply
