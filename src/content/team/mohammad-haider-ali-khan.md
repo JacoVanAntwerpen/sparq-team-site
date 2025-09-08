@@ -13,7 +13,7 @@ longSummary: Haider is a Postdoctoral Research Associate at the Particles and
   at University of New South Wales (UNSW). He is also affiliated with the
   Australian Research Council Training Centre for the Global Hydrogen Economy
   (GlobH2E) and the UNSW School of Minerals and Energy Resource Engineering
-  (MERA). His research is focused on technoeconomic analysis of incumbent and
+  (MERE). His research is focused on technoeconomic analysis of incumbent and
   emerging Power to X technologies. The research has yielded in development of
   several open-source modelling and costing tools to assist research, industry,
   and governments in establishing their Power to X portfolios. In parallel,
