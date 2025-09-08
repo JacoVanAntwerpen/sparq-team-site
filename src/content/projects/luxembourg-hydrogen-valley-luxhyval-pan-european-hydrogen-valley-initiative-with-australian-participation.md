@@ -43,7 +43,7 @@ longDetails: >-
 
   LuxHyVal represents a high-impact demonstration of green hydrogen’s potential to decarbonise critical sectors at a regional scale. The project’s comprehensive framework—from digital twin operations to public acceptance strategies—offers a robust blueprint for hydrogen valley replication. For Australia and UNSW, the collaboration enhances global research reach and strengthens partnerships within the European hydrogen innovation ecosystem.
 tileImage: /uploads/luxhyval.png
-tileImageFocus: center
+tileImageFocus: left
 heroImage: /uploads/luxhyval.png
 heroLayout: aside
 heroFocalPoint: center
