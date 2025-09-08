@@ -24,4 +24,7 @@ order: 2
 linkedProjects:
   - pacific-hydrogen-strategy
   - nsw-power-to-x-industry-feasibility-pre-feasibility-studies
+  - green-metals-for-sustainable-steel-susteelag-–-australia–germany-collaboration
+  - hysupply-australian–german-feasibility-study-of-a-renewable-hydrogen-supply-chain
+  - luxembourg-hydrogen-valley-luxhyval-pan-european-hydrogen-valley-initiative-with-australian-participation
 ---
