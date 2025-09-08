@@ -1,10 +1,11 @@
 ---
-name: Jaco van Antwerpen
 slug: jaco-van-antwerpen
+name: Jaco van Antwerpen
 role: Research Officer | Renewable Fuels PhD | Techno-economic Specialist
 photo: /uploads/jaco-van-antwerpen-2.jpg
 email: j.vanantwerpen@unsw.edu.au
 linkedin: https://www.linkedin.com/in/jaco-van-antwerpen
+showOnHome: true
 longSummary: "Jaco is a Research Officer and Ph.D. Candidate at Particles and
   Catalysis Research Group under the school of chemical engineerring at the
   University of New South Wales (UNSW). He is also affiliated with the
@@ -17,4 +18,5 @@ longSummary: "Jaco is a Research Officer and Ph.D. Candidate at Particles and
   commercial deployment of renewable and low-carbon liquid fuels. "
 linkedProjects:
   - pacific-hydrogen-strategy
+  - nsw-power-to-x-industry-feasibility-pre-feasibility-studies
 ---
