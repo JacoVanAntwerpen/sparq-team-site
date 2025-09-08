@@ -280,3 +280,42 @@ collections:
       - { label: "Alt text", name: "alt", widget: "string", required: false }
       - { label: "Credit (text)", name: "credit", widget: "string", required: false }
       - { label: "Credit URL", name: "creditUrl", widget: "string", required: false }
+
+  # -----------------------------
+  # Pages (singletons)
+  # -----------------------------
+  - name: pages
+    label: Pages
+    delete: false
+    editor:
+      preview: false
+    files:
+      - label: "About Page"
+        name: "about"
+        file: "src/content/pages/about.md"
+        format: frontmatter
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+  # -----------------------------
+  # Settings
+  # -----------------------------
+  - name: settings
+    label: Settings
+    delete: false
+    files:
+      - label: "Navigation"
+        name: "nav"
+        file: "src/content/settings/nav.json"
+        format: json
+        fields:
+          - { label: "Show Home tab", name: "homeEnabled", widget: "boolean", default: true }
+          - { label: "Show About tab", name: "aboutEnabled", widget: "boolean", default: true }
+          - { label: "Show Our team tab", name: "teamEnabled", widget: "boolean", default: true }
+          - { label: "Show Projects tab", name: "projectsEnabled", widget: "boolean", default: true }
+          - { label: "Show Publications tab", name: "publicationsEnabled", widget: "boolean", default: true }
+          - { label: "Show Tools & Resources tab", name: "resourcesEnabled", widget: "boolean", default: true }
+          - { label: "Show Contact tab", name: "contactEnabled", widget: "boolean", default: true }
+
+

@@ -1,0 +1,9 @@
+{
+  "homeEnabled": true,
+  "aboutEnabled": true,
+  "teamEnabled": true,
+  "projectsEnabled": true,
+  "publicationsEnabled": false,
+  "resourcesEnabled": false,
+  "contactEnabled": true
+}

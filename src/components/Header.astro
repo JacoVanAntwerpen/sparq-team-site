@@ -1,14 +1,40 @@
 ---
-const NAV = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/team', label: 'Our team' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/publications', label: 'Publications' },
-  { href: '/tools', label: 'Tools & Resources' },
-  { href: '/contact', label: 'Contact' },
+import { getEntry } from 'astro:content';
+
+// Defaults (safe if settings/nav.json is missing)
+let toggles = {
+  homeEnabled: true,
+  aboutEnabled: true,
+  teamEnabled: true,
+  projectsEnabled: true,
+  publicationsEnabled: true,
+  resourcesEnabled: true,
+  contactEnabled: true,
+};
+
+try {
+  const settings = await getEntry('settings', 'nav');
+  // Merge, preserving defaults for any missing keys
+  toggles = { ...toggles, ...(settings?.data ?? {}) };
+} catch {
+  // no settings file at build-time — keep defaults
+}
+
+const RAW_NAV = [
+  { href: '/', label: 'Home', key: 'homeEnabled' },
+  { href: '/about', label: 'About', key: 'aboutEnabled' },
+  { href: '/team', label: 'Our team', key: 'teamEnabled' },
+  { href: '/projects', label: 'Projects', key: 'projectsEnabled' },
+  { href: '/publications', label: 'Publications', key: 'publicationsEnabled' },
+  { href: '/tools', label: 'Tools & Resources', key: 'resourcesEnabled' },
+  { href: '/contact', label: 'Contact', key: 'contactEnabled' },
 ];
+
+// Filter by toggle while preserving order/labels
+const NAV = RAW_NAV.filter(item => toggles[item.key] !== false);
 ---
+
+
 <header class="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur">
   <div class="mx-auto max-w-7xl px-4 h-16 flex items-center justify-between">
     <a href="/" class="flex items-center gap-3" aria-label="SPARQ home">

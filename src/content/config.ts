@@ -188,6 +188,27 @@ const media = defineCollection({
     .passthrough(),
 });
 
+// NEW: “pages” (markdown) and “settings” (json/yaml) collections
+const pages = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+  }),
+});
+
+const settings = defineCollection({
+  type: "data",
+  schema: z.object({
+    homeEnabled: z.boolean().default(true),
+    aboutEnabled: z.boolean().default(true),
+    teamEnabled: z.boolean().default(true),
+    projectsEnabled: z.boolean().default(true),
+    publicationsEnabled: z.boolean().default(true),
+    resourcesEnabled: z.boolean().default(true),
+    contactEnabled: z.boolean().default(true),
+  }),
+});
+
 export const collections = {
   projects,
   team,
@@ -195,4 +216,8 @@ export const collections = {
   resources,
   partners,
   media,
+  // NEW
+  pages,
+  settings,
 };
+

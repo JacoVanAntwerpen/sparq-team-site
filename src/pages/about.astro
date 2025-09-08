@@ -1,19 +1,16 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
+import { getEntry } from 'astro:content';
+
+// Load markdown from the pages collection (about.md)
+const about = await getEntry('pages', 'about');
+const { Content } = await about.render();
 ---
-<BaseLayout title="About — SPARQ Team">
-  <Section id="about" title="About SPARQ">
-    <div class="prose max-w-none">
-      <p>
-        SPARQ is a techno‑economic analysis team specialising in renewable fuels and
-        hard‑to‑abate sectors. We combine rigorous models with pragmatic advisory to
-        help clients navigate uncertainty and act with confidence.
-      </p>
-      <p>
-        Our work spans feasibility, FEED support, market design, and open‑source
-        tooling—bridging the gap between research and investable projects.
-      </p>
-    </div>
+<BaseLayout title={`About — SPARQ Team`}>
+  <Section id="about" title={about.data.title}>
+    <article class="prose max-w-none">
+      <Content />
+    </article>
   </Section>
 </BaseLayout>
