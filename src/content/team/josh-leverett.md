@@ -1,12 +1,13 @@
 ---
 prefix: Dr.
-name: Josh Leverett
 slug: josh-leverett
+name: Josh Leverett
 role: Co-founder and CPO at OzAmmonia | Renewable Fuels PhD | Hydrogen and
   Sustainability Strategy
 photo: /uploads/1743158095919.jpg
 email: j.leverett@unsw.edu.au
 linkedin: https://www.linkedin.com/in/joshleverett6
+showOnHome: true
 longSummary: Josh is a Postdoctoral researcher in the Particles and Catalysis
   Research Group within the School of Chemical Engineering. His research focuses
   on electrocatalyst design and synthesis, electrochemical clean energy
