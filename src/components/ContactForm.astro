@@ -3,13 +3,20 @@ import { SITE } from '@data/site';
 ---
 <div class="grid gap-6 md:grid-cols-2">
   <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-    <form onsubmit="event.preventDefault(); window.location = `mailto:${SITE.email}`" class="grid gap-3">
-      <input class="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm" placeholder="Your name" />
-      <input class="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm" placeholder="Your email" />
-      <textarea class="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm" placeholder="Message" rows="5"></textarea>
-      <button class="rounded-xl border border-neutral-200 bg-neutral-900 text-white px-4 py-2 text-sm font-semibold hover:opacity-90">Send</button>
+    <form id="contact-form" class="grid gap-3" novalidate>
+      <input id="cf-name"   name="name"   class="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm" placeholder="Your name" />
+      <input id="cf-email"  name="email"  class="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm" placeholder="Your email" />
+      <textarea id="cf-msg" name="message" class="w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm" placeholder="Message" rows="5"></textarea>
+
+      <button id="cf-send" type="submit" class="rounded-xl border border-neutral-200 bg-neutral-900 px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+        Send
+      </button>
+
+      <!-- Inline friendly feedback -->
+      <div id="cf-feedback" class="hidden rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-sm" aria-live="polite"></div>
     </form>
   </div>
+
   <div class="space-y-3">
     <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
       <div class="space-y-1">
@@ -25,3 +32,50 @@ import { SITE } from '@data/site';
     </div>
   </div>
 </div>
+
+<script is:inline>
+  const form = document.getElementById('contact-form');
+  const nameEl = document.getElementById('cf-name');
+  const emailEl = document.getElementById('cf-email');
+  const msgEl = document.getElementById('cf-msg');
+  const btnEl = document.getElementById('cf-send');
+  const feedbackEl = document.getElementById('cf-feedback');
+
+  function showMessage(text) {
+    feedbackEl.textContent = text;
+    feedbackEl.classList.remove('hidden');
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const name = (nameEl?.value || '').trim();
+    const email = (emailEl?.value || '').trim();
+    const msg = (msgEl?.value || '').trim();
+
+    // Build a helpful mailto:
+    const subject = encodeURIComponent(`Website contact from ${name || 'visitor'}`);
+    const bodyLines = [
+      msg || '',
+      '',
+      `— From: ${name || 'Anonymous'}`,
+      email ? `Email: ${email}` : '',
+    ].filter(Boolean);
+    const body = encodeURIComponent(bodyLines.join('\n'));
+
+    const link = `mailto:${SITE.email}?subject=${subject}&body=${body}`;
+
+    // Visually acknowledge + clear fields immediately
+    btnEl?.setAttribute('disabled', 'true');
+    showMessage('Thanks! Your email app should open now. If it didn’t, you can email us directly at ' + `${SITE.email}.`);
+    nameEl && (nameEl.value = '');
+    emailEl && (emailEl.value = '');
+    msgEl && (msgEl.value = '');
+
+    // Trigger the mailto navigation last
+    window.location.href = link;
+
+    // Re-enable the button after a moment (in case mail app doesn't steal focus)
+    setTimeout(() => btnEl?.removeAttribute('disabled'), 1500);
+  });
+</script>

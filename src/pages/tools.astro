@@ -7,16 +7,49 @@ const resources = await getCollection('resources');
 <BaseLayout title="Tools & Resources — SPARQ Team">
   <Section id="tools" title="Tools & platforms" subtitle="Link to docs, repos, or hosted apps.">
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {resources.map(r => (
-        <a href={`/resources/${r.slug}`} class="rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow block overflow-hidden">
-          {r.data.image && <img src={r.data.image} alt={r.data.title} class="h-40 w-full object-cover" loading="lazy" />}
-          <div class="p-6">
-            <h3 class="font-semibold">{r.data.title}</h3>
-            <p class="mt-2 text-sm text-neutral-700">{r.data.oneLine}</p>
-            {r.data.summary && <p class="mt-2 text-sm text-neutral-700">{r.data.summary}</p>}
-          </div>
-        </a>
-      ))}
+      {/*
+        Match ProjectCard behaviour:
+        - pick tileImage → heroImage → image
+        - respect tileImageFocus for object-position
+      */}
+      {resources.map((r) => {
+        const d: any = r.data ?? {};
+        const img = d.tileImage || d.heroImage || d.image;
+        const focus = (d.tileImageFocus || 'center') as string;
+        const posMap: Record<string, string> = {
+          center: 'center',
+          top: 'center top',
+          bottom: 'center bottom',
+          left: 'left center',
+          right: 'right center',
+          'top-left': 'left top',
+          'top-right': 'right top',
+          'bottom-left': 'left bottom',
+          'bottom-right': 'right bottom',
+        };
+        const objectPosition = posMap[focus] || 'center';
+
+        return (
+          <a href={`/resources/${r.slug}`} class="group rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow block overflow-hidden">
+            {img && (
+              <div class="aspect-[16/9] w-full overflow-hidden bg-neutral-100">
+                <img
+                  src={img}
+                  alt={d.tileImageAlt || d.title}
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  style={`object-position:${objectPosition};`}
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div class="p-6">
+              <h3 class="font-semibold">{d.title}</h3>
+              {d.oneLine && <p class="mt-2 text-sm text-neutral-700">{d.oneLine}</p>}
+              {d.summary && <p class="mt-2 text-sm text-neutral-700">{d.summary}</p>}
+            </div>
+          </a>
+        );
+      })}
     </div>
   </Section>
 </BaseLayout>

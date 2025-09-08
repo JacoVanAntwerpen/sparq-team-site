@@ -12,9 +12,13 @@ const { entry } = Astro.props;
 ---
 <BaseLayout title={`${entry.data.title} — Resources — SPARQ Team`}>
   <Section id="resource" title={entry.data.title} subtitle={entry.data.oneLine}>
-    {entry.data.image && (
-      <img src={entry.data.image} alt={entry.data.title} class="w-full max-w-3xl rounded-2xl shadow-sm mb-6" loading="eager" />
-    )}
+    {(() => {
+      const hero = entry.data.heroImage || entry.data.image;
+      return hero ? (
+        <img src={hero} alt={entry.data.title} class="w-full max-w-3xl rounded-2xl shadow-sm mb-6" loading="eager" />
+      ) : null;
+    })()}
+
 
     {entry.data.summary && <p class="text-neutral-800">{entry.data.summary}</p>}
 

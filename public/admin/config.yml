@@ -244,9 +244,62 @@ collections:
     format: frontmatter
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "URL", name: "url", widget: "string" }
-      - { label: "Image", name: "image", widget: "image", required: false }
-      - { label: "Description", name: "desc", widget: "text", required: false }
+      - { label: "One-line description", name: "oneLine", widget: "string", required: false }
+      - { label: "Summary", name: "summary", widget: "text", required: false }
+
+      # Tile image (cards on Tools page)
+      - { label: "Tile image", name: "tileImage", widget: "image", required: false }
+      - { label: "Tile image alt", name: "tileImageAlt", widget: "string", required: false }
+      - label: "Tile image focus"
+        name: "tileImageFocus"
+        widget: "select"
+        options:
+          [
+            "center",
+            "top",
+            "bottom",
+            "left",
+            "right",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+          ]
+        default: "center"
+
+      # Hero image (shown on the resource detail page if present, else fallback to image/tile)
+      - { label: "Hero image", name: "heroImage", widget: "image", required: false }
+
+      # Legacy/fallback poster (still supported by pages)
+      - { label: "Poster image (legacy fallback)", name: "image", widget: "image", required: false }
+
+      # Links (pairs of text+url)
+      - label: "Links"
+        name: "links"
+        widget: "list"
+        required: false
+        collapsed: true
+        summary: "{{fields.label}} → {{fields.url}}"
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "URL", name: "url", widget: "string" }
+
+      # Downloads (label + uploaded file)
+      - label: "Files"
+        name: "files"
+        widget: "list"
+        required: false
+        collapsed: true
+        summary: "{{fields.label}} — {{fields.file}}"
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "File",  name: "file",  widget: "file", media_library: { allow_multiple: false } }
+
+      - { label: "Citation (optional)", name: "citation", widget: "string", required: false }
+
+      # Optional single URL (kept for compatibility; not required)
+      - { label: "Primary URL (optional)", name: "url", widget: "string", required: false }
+
       - { label: "Order", name: "order", widget: "number", required: false }
 
   # -----------------------------

@@ -152,13 +152,44 @@ const resources = defineCollection({
   schema: z
     .object({
       title: z.string(),
-      url: urlLoose,
-      image: z.string().optional(),
-      desc: z.string().optional(),
+      oneLine: z.string().optional(),
+      summary: z.string().optional(),
+
+      // Images
+      image: z.string().optional(),      // legacy/fallback
+      tileImage: z.string().optional(),
+      tileImageAlt: z.string().optional(),
+      tileImageFocus: z
+        .enum([
+          "center",
+          "top",
+          "bottom",
+          "left",
+          "right",
+          "top-left",
+          "top-right",
+          "bottom-left",
+          "bottom-right",
+        ])
+        .optional()
+        .default("center"),
+      heroImage: z.string().optional(),
+
+      // Links and files
+      links: z
+        .array(z.object({ label: z.string(), url: urlLoose }))
+        .default([]),
+      files: z
+        .array(z.object({ label: z.string(), file: urlLoose }))
+        .default([]),
+
+      citation: z.string().optional(),
+      url: urlLoose.optional(),          // was required; now optional
       order: numberLoose,
     })
     .passthrough(),
 });
+
 
 /** Partners (Collaborators & Affiliates) */
 const partners = defineCollection({
