@@ -2,35 +2,36 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import Section from '@components/Section.astro';
 import { getCollection } from 'astro:content';
+
 const resources = await getCollection('resources');
+
+/** Map our tileImageFocus to CSS object-position */
+const posMap = {
+  center: 'center',
+  top: 'center top',
+  bottom: 'center bottom',
+  left: 'left center',
+  right: 'right center',
+  'top-left': 'left top',
+  'top-right': 'right top',
+  'bottom-left': 'left bottom',
+  'bottom-right': 'right bottom',
+};
+const focusToPos = (focus = 'center') => posMap[focus] || 'center';
 ---
 <BaseLayout title="Tools & Resources — SPARQ Team">
   <Section id="tools" title="Tools & platforms" subtitle="Link to docs, repos, or hosted apps.">
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {/*
-        Match ProjectCard behaviour:
-        - pick tileImage → heroImage → image
-        - respect tileImageFocus for object-position
-      */}
       {resources.map((r) => {
-        const d: any = r.data ?? {};
-        const img = d.tileImage || d.heroImage || d.image;
-        const focus = (d.tileImageFocus || 'center') as string;
-        const posMap: Record<string, string> = {
-          center: 'center',
-          top: 'center top',
-          bottom: 'center bottom',
-          left: 'left center',
-          right: 'right center',
-          'top-left': 'left top',
-          'top-right': 'right top',
-          'bottom-left': 'left bottom',
-          'bottom-right': 'right bottom',
-        };
-        const objectPosition = posMap[focus] || 'center';
+        const d = r.data ?? {};
+        const img = d.tileImage || d.heroImage || d.image; // tile → hero → fallback
+        const objectPosition = focusToPos(d.tileImageFocus || 'center');
 
         return (
-          <a href={`/resources/${r.slug}`} class="group rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow block overflow-hidden">
+          <a
+            href={`/resources/${r.slug}`}
+            class="group rounded-2xl border border-neutral-200 bg-white shadow-sm hover:shadow-md transition-shadow block overflow-hidden"
+          >
             {img && (
               <div class="aspect-[16/9] w-full overflow-hidden bg-neutral-100">
                 <img
