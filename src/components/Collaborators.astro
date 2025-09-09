@@ -5,22 +5,24 @@ const partnersAll = (await getCollection('partners')).sort(
   (a, b) => (a.data.order ?? 9999) - (b.data.order ?? 9999)
 );
 
-/** Grouping
- *  Preferred: use explicit .data.category (enum)
- *  Legacy fallback: if no category, treat affiliate:true as "affiliations"
+/**
+ * Grouping:
+ * - Preferred: explicit `data.category` (enum: affiliations | universities | industry | government)
+ * - Legacy fallback: if no category but `affiliate: true` => treat as "affiliations"
+ * - Otherwise goes to `_other` (the unlabeled group at the end)
  */
-const byCat = {
-  affiliations: [] as any[],
-  universities: [] as any[],
-  industry: [] as any[],
-  government: [] as any[],
-  _other: [] as any[], // safety net for unclassified
+const byCat: Record<string, any[]> = {
+  affiliations: [],
+  universities: [],
+  industry: [],
+  government: [],
+  _other: [],
 };
 
 for (const p of partnersAll) {
   const cat = (p.data.category ?? null) as string | null;
-  if (cat && byCat[cat as keyof typeof byCat]) {
-    byCat[cat as keyof typeof byCat].push(p);
+  if (cat && (cat === 'affiliations' || cat === 'universities' || cat === 'industry' || cat === 'government')) {
+    byCat[cat].push(p);
   } else if (p.data.affiliate === true) {
     byCat.affiliations.push(p); // legacy mapping
   } else {
@@ -28,41 +30,46 @@ for (const p of partnersAll) {
   }
 }
 
+// Maintain existing grid visuals
 const gridClasses =
   "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center";
 const boxClasses = "h-12 md:h-16 flex items-center justify-center";
 const imgClasses = "h-full w-auto max-w-full object-contain";
 
-// Helper to render a group block (no headings; keep existing aesthetics)
-function Group({ items }: { items: any[] }) {
-  return items.length ? (
-    <section>
-      <div class={gridClasses}>
-        {items.map((p) => (
-          <div class={boxClasses}>
-            {p.data.url ? (
-              <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
-                <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
-              </a>
-            ) : (
-              <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
-            )}
-          </div>
-        ))}
-      </div>
-      <div class="my-8 h-px bg-gray-200"></div>
-    </section>
-  ) : null;
-}
+// Render order: Affiliations → Universities & Institutions → Industry → Government
+const groups: any[][] = [
+  byCat.affiliations,
+  byCat.universities,
+  byCat.industry,
+  byCat.government,
+];
+const nonEmptyGroups = groups.filter((g) => g.length > 0);
 ---
 
-{/* Order: Affiliations → Universities → Industry → Government */}
-{Group({ items: byCat.affiliations })}
-{Group({ items: byCat.universities })}
-{Group({ items: byCat.industry })}
-{Group({ items: byCat.government })}
+{nonEmptyGroups.map((items, idx) => (
+  <section>
+    <div class={gridClasses}>
+      {items.map((p) => (
+        <div class={boxClasses}>
+          {p.data.url ? (
+            <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
+              <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+            </a>
+          ) : (
+            <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+          )}
+        </div>
+      ))}
+    </div>
 
-/* Last fallback block if anything remains unclassified; no extra divider at end */
+    {/* Put a divider after this group only if there are more groups after it
+        OR if there will be a final unlabeled (_other) block. */}
+    {(idx < nonEmptyGroups.length - 1 || byCat._other.length) ? (
+      <div class="my-8 h-px bg-gray-200"></div>
+    ) : null}
+  </section>
+))}
+
 {byCat._other.length ? (
   <section>
     <div class={gridClasses}>
