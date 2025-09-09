@@ -1,6 +1,6 @@
 ---
 name: NSW Office of Chief Scientist and Engineer
-logo: /uploads/nswgov_ocse_logo_square.png
+logo: /uploads/office-of-the-chief-scientist-and-engineer.png
 affiliate: false
 category: government
 ---
