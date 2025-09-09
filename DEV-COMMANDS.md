@@ -13,6 +13,7 @@ git pull --ff-only origin main
 # Rebase local commits on top of remote 
 git fetch origin
 git rebase origin/main
+git push origin main
 
 # Stage, Commit, Push (Send changes to online repo, all changes new/modified/deleted)
 git add -A

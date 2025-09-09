@@ -36,7 +36,7 @@ const gridClasses =
 const boxClasses = "h-12 md:h-16 flex items-center justify-center";
 const imgClasses = "h-full w-auto max-w-full object-contain";
 
-// Render order + labels (matching your original “Affiliations” label style)
+// Render order + labels
 const groups = [
   { key: 'affiliations', label: 'Affiliations', items: byCat.affiliations },
   { key: 'universities', label: 'Universities & Institutions', items: byCat.universities },
@@ -47,8 +47,8 @@ const groups = [
 
 {groups.map((g, idx) => (
   <section>
-    {/* Label + skinny line (exact style used before) */}
-    <div class="mb-3 mt-1 flex items-center gap-3">
+    {/* Label + skinny line (same style as original “Affiliations” heading) */}
+    <div class={`flex items-center gap-3 ${idx > 0 ? 'mt-10' : 'mt-1'} mb-3`}>
       <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-600">{g.label}</h3>
       <div class="h-px flex-1 bg-gray-200"></div>
     </div>
@@ -66,18 +66,12 @@ const groups = [
         </div>
       ))}
     </div>
-
-    {/* Divider after this group if more groups follow OR if there will be a final unlabeled block */}
-    {(idx < groups.length - 1 || byCat._other.length) ? (
-      <div class="my-8 h-px bg-gray-200"></div>
-    ) : null}
   </section>
 ))}
 
 {byCat._other.length ? (
   <section>
-    {/* No label for the legacy unlabeled group, just like before */}
-    <div class={gridClasses}>
+    <div class={`mt-10 ${gridClasses}`}>
       {byCat._other.map((p) => (
         <div class={boxClasses}>
           {p.data.url ? (
