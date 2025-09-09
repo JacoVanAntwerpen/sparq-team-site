@@ -1,6 +1,6 @@
 ---
 name: Government of Vietnam
-logo: /uploads/emblem_of_vietnam.svg.png
+logo: /uploads/government-of-vietnam.png
 affiliate: false
 category: government
 ---
