@@ -1,29 +1,72 @@
 ---
-// src/components/Collaborators.astro
 import { getCollection } from 'astro:content';
 
 const partnersAll = (await getCollection('partners')).sort(
   (a, b) => (a.data.order ?? 9999) - (b.data.order ?? 9999)
 );
 
-// Optional boolean in your content frontmatter: `affiliate: true`
-const affiliates = partnersAll.filter((p) => p.data.affiliate === true);
-const others = partnersAll.filter((p) => !p.data.affiliate);
+/** Grouping
+ *  Preferred: use explicit .data.category (enum)
+ *  Legacy fallback: if no category, treat affiliate:true as "affiliations"
+ */
+const byCat = {
+  affiliations: [] as any[],
+  universities: [] as any[],
+  industry: [] as any[],
+  government: [] as any[],
+  _other: [] as any[], // safety net for unclassified
+};
+
+for (const p of partnersAll) {
+  const cat = (p.data.category ?? null) as string | null;
+  if (cat && byCat[cat as keyof typeof byCat]) {
+    byCat[cat as keyof typeof byCat].push(p);
+  } else if (p.data.affiliate === true) {
+    byCat.affiliations.push(p); // legacy mapping
+  } else {
+    byCat._other.push(p);
+  }
+}
 
 const gridClasses =
   "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-10 place-items-center";
-const boxClasses = "h-12 md:h-16 flex items-center justify-center"; // <- ensures non-zero height
+const boxClasses = "h-12 md:h-16 flex items-center justify-center";
 const imgClasses = "h-full w-auto max-w-full object-contain";
----
-{affiliates.length > 0 ? (
-  <section>
-    <div class="mb-3 mt-1 flex items-center gap-3">
-      <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-600">Affiliations</h3>
-      <div class="h-px flex-1 bg-gray-200"></div>
-    </div>
 
+// Helper to render a group block (no headings; keep existing aesthetics)
+function Group({ items }: { items: any[] }) {
+  return items.length ? (
+    <section>
+      <div class={gridClasses}>
+        {items.map((p) => (
+          <div class={boxClasses}>
+            {p.data.url ? (
+              <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
+                <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+              </a>
+            ) : (
+              <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
+            )}
+          </div>
+        ))}
+      </div>
+      <div class="my-8 h-px bg-gray-200"></div>
+    </section>
+  ) : null;
+}
+---
+
+{/* Order: Affiliations → Universities → Industry → Government */}
+{Group({ items: byCat.affiliations })}
+{Group({ items: byCat.universities })}
+{Group({ items: byCat.industry })}
+{Group({ items: byCat.government })}
+
+/* Last fallback block if anything remains unclassified; no extra divider at end */
+{byCat._other.length ? (
+  <section>
     <div class={gridClasses}>
-      {affiliates.map((p) => (
+      {byCat._other.map((p) => (
         <div class={boxClasses}>
           {p.data.url ? (
             <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
@@ -35,23 +78,5 @@ const imgClasses = "h-full w-auto max-w-full object-contain";
         </div>
       ))}
     </div>
-
-    <div class="my-8 h-px bg-gray-200"></div>
   </section>
 ) : null}
-
-<section>
-  <div class={gridClasses}>
-    {others.map((p) => (
-      <div class={boxClasses}>
-        {p.data.url ? (
-          <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
-            <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
-          </a>
-        ) : (
-          <img src={p.data.logo} alt={p.data.name} loading="lazy" decoding="async" class={imgClasses} />
-        )}
-      </div>
-    ))}
-  </div>
-</section>

@@ -199,6 +199,10 @@ const partners = defineCollection({
       name: z.string(),
       url: urlLoose,
       logo: z.string().optional(),
+      category: z
+        .enum(["affiliations", "universities", "industry", "government"])
+        .optional(),
+      // Legacy toggle (kept for backwards-compatibility)
       affiliate: z.boolean().optional().default(false),
       order: numberLoose,
     })

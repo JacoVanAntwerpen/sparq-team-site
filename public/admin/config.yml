@@ -315,7 +315,21 @@ collections:
       - { label: "Name", name: "name", widget: "string" }
       - { label: "Website URL", name: "url", widget: "string", required: false }
       - { label: "Logo", name: "logo", widget: "image" }
-      - { label: "Affiliation (toggle)", name: "affiliate", widget: "boolean", default: false, required: false }
+
+      # NEW: exactly one group (mutually exclusive)
+      - label: "Group"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Affiliations", value: "affiliations" }
+          - { label: "Universities & Institutions", value: "universities" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Government", value: "government" }
+        required: false
+
+      # (Optional) Legacy toggle — you can remove after migrating existing entries
+      # - { label: "Affiliation (legacy toggle)", name: "affiliate", widget: "boolean", default: false, required: false }
+
       - { label: "Order", name: "order", widget: "number", required: false }
 
   # -----------------------------
