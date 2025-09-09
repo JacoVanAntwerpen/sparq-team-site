@@ -11,7 +11,7 @@ const partnersAll = (await getCollection('partners')).sort(
  * - Legacy fallback: if no category but `affiliate: true` => treat as "affiliations"
  * - Otherwise goes to `_other` (the unlabeled group at the end)
  */
-const byCat: Record<string, any[]> = {
+const byCat = {
   affiliations: [],
   universities: [],
   industry: [],
@@ -20,7 +20,7 @@ const byCat: Record<string, any[]> = {
 };
 
 for (const p of partnersAll) {
-  const cat = (p.data.category ?? null) as string | null;
+  const cat = (p.data.category ?? null);
   if (cat && (cat === 'affiliations' || cat === 'universities' || cat === 'industry' || cat === 'government')) {
     byCat[cat].push(p);
   } else if (p.data.affiliate === true) {
@@ -36,20 +36,25 @@ const gridClasses =
 const boxClasses = "h-12 md:h-16 flex items-center justify-center";
 const imgClasses = "h-full w-auto max-w-full object-contain";
 
-// Render order: Affiliations → Universities & Institutions → Industry → Government
-const groups: any[][] = [
-  byCat.affiliations,
-  byCat.universities,
-  byCat.industry,
-  byCat.government,
-];
-const nonEmptyGroups = groups.filter((g) => g.length > 0);
+// Render order + labels (matching your original “Affiliations” label style)
+const groups = [
+  { key: 'affiliations', label: 'Affiliations', items: byCat.affiliations },
+  { key: 'universities', label: 'Universities & Institutions', items: byCat.universities },
+  { key: 'industry', label: 'Industry', items: byCat.industry },
+  { key: 'government', label: 'Government', items: byCat.government },
+].filter(g => g.items.length > 0);
 ---
 
-{nonEmptyGroups.map((items, idx) => (
+{groups.map((g, idx) => (
   <section>
+    {/* Label + skinny line (exact style used before) */}
+    <div class="mb-3 mt-1 flex items-center gap-3">
+      <h3 class="text-xs font-semibold uppercase tracking-wide text-gray-600">{g.label}</h3>
+      <div class="h-px flex-1 bg-gray-200"></div>
+    </div>
+
     <div class={gridClasses}>
-      {items.map((p) => (
+      {g.items.map((p) => (
         <div class={boxClasses}>
           {p.data.url ? (
             <a href={p.data.url} target="_blank" rel="noopener" aria-label={p.data.name}>
@@ -62,9 +67,8 @@ const nonEmptyGroups = groups.filter((g) => g.length > 0);
       ))}
     </div>
 
-    {/* Put a divider after this group only if there are more groups after it
-        OR if there will be a final unlabeled (_other) block. */}
-    {(idx < nonEmptyGroups.length - 1 || byCat._other.length) ? (
+    {/* Divider after this group if more groups follow OR if there will be a final unlabeled block */}
+    {(idx < groups.length - 1 || byCat._other.length) ? (
       <div class="my-8 h-px bg-gray-200"></div>
     ) : null}
   </section>
@@ -72,6 +76,7 @@ const nonEmptyGroups = groups.filter((g) => g.length > 0);
 
 {byCat._other.length ? (
   <section>
+    {/* No label for the legacy unlabeled group, just like before */}
     <div class={gridClasses}>
       {byCat._other.map((p) => (
         <div class={boxClasses}>
