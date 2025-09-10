@@ -1,7 +1,7 @@
 ---
-title: "HySupply: Australian–German Feasibility Study of a Renewable Hydrogen
+title: "HySupply: Australian-German Feasibility Study of a Renewable Hydrogen
   Supply Chain"
-shortDescription: A two-year feasibility study (Nov 2020–Jan 2023) exploring the
+shortDescription: A two-year feasibility study (Nov 2020-Jan 2023) exploring the
   technical, economic, regulatory, and logistical viability of exporting
   renewable hydrogen (and its derivatives) from Australia to Germany.
 longDetails: >-
