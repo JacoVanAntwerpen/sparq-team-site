@@ -1,5 +1,5 @@
 ---
-title: Green Metals for Sustainable Steel (SuSteelAG) – Australia–Germany
+title: Green Metals for Sustainable Steel (SuSteelAG) - Australia-Germany
   Collaboration
 shortDescription: A feasibility and technical study led by UNSW to explore the
   creation of a sustainable green iron and steel value chain between Australia
