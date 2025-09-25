@@ -2,7 +2,7 @@
 slug: jaco-van-antwerpen
 name: Jaco van Antwerpen
 role: Research Officer | Renewable Fuels PhD | Techno-economic Specialist
-photo: /uploads/jaco-van-antwerpen-2.jpg
+photo: /uploads/jaco-headshot.png
 email: j.vanantwerpen@unsw.edu.au
 linkedin: https://www.linkedin.com/in/jaco-van-antwerpen
 showOnHome: true
