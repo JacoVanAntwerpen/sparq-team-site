@@ -14,8 +14,8 @@ longSummary: "Jaco is a Research Officer and Ph.D. Candidate at Particles and
   low carbon fuel technologies and value chains. Outputs have included open
   source modelling and costing tools which assist project selection, siting and
   design, while also guiding policy decisions. Jaco has been active in several
-  industry and government let studies for decarbonisation roadmaps and
-  commercial deployment of renewable and low-carbon liquid fuels. "
+  industry and government studies for decarbonisation roadmaps and commercial
+  deployment of renewable and low-carbon liquid fuels. "
 linkedProjects:
   - pacific-hydrogen-strategy
   - nsw-power-to-x-industry-feasibility-pre-feasibility-studies
