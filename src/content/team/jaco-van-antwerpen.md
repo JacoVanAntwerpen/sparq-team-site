@@ -6,16 +6,16 @@ photo: /uploads/jaco-headshot.png
 email: j.vanantwerpen@unsw.edu.au
 linkedin: https://www.linkedin.com/in/jaco-van-antwerpen
 showOnHome: true
-longSummary: "Jaco is a Research Officer and Ph.D. Candidate at Particles and
-  Catalysis Research Group under the school of chemical engineerring at the
-  University of New South Wales (UNSW). He is also affiliated with the
-  Australian Research Council Training Centre for the Global Hydrogen Economy
-  (GlobH2E). His research focusses on techno-economic analysis of renewable and
-  low carbon fuel technologies and value chains. Outputs have included open
-  source modelling and costing tools which assist project selection, siting and
-  design, while also guiding policy decisions. Jaco has been active in several
-  industry and government studies for decarbonisation roadmaps and commercial
-  deployment of renewable and low-carbon liquid fuels. "
+longSummary: >-
+  Jaco is an expert in techno-economic and life-cycle analysis of renewable and
+  low-carbon fuel technologies. He specialises in developing and leading
+  open-source modelling and costing tools for low-carbon liquid fuel pathways
+  such as renewable methanol and sustainable aviation fuel. This research and
+  modelling outputs enable project selection, design optimisation and
+  evidence-based policy and investment decisions. 
+
+
+  He has played a key role in multiple industry and government studies advancing decarbonisation roadmaps and the commercial deployment of renewable and low-carbon liquid fuels. Jaco is currently a Research Officer and PhD candidate in Chemical Engineering at the University of New South Wales (UNSW).
 linkedProjects:
   - pacific-hydrogen-strategy
   - nsw-power-to-x-industry-feasibility-pre-feasibility-studies
