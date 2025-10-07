@@ -156,6 +156,8 @@ const resources = defineCollection({
       title: z.string(),
       oneLine: z.string().optional(),
       summary: z.string().optional(),
+      /** New: long-form markdown for individual tool pages */
+      longDetails: z.string().optional(),
 
       // Images
       image: z.string().optional(),      // legacy/fallback
