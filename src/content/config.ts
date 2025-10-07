@@ -52,6 +52,8 @@ const projects = defineCollection({
       longDetails: z.string().optional(),
       content: z.any().optional(),
       featured: z.boolean().default(false),
+      /** Controls list linking: if true, show only title & description on the Projects page without linking */
+      listOnly: z.boolean().default(false),
 
       // Card imagery
       tileImage: z.string().optional(),
