@@ -4,6 +4,6 @@
   "teamEnabled": true,
   "projectsEnabled": true,
   "publicationsEnabled": false,
-  "resourcesEnabled": false,
+  "resourcesEnabled": true,
   "contactEnabled": true
 }
