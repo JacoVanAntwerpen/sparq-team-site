@@ -27,6 +27,7 @@ longDetails: >-
 
 
   This study lays critical groundwork for establishing a domestic e-SAF industry, highlighting how NSW could reduce aviation emissions, generate economic value through green jobs, and leverage its infrastructure and energy advantage. It proposes strategic interventions to drive adoption, positioning NSW as a national leader in aviation decarbonisation innovation.
+listOnly: true
 tileImage: /uploads/e-saf-value-chain-in-nsw.png
 tileImageFocus: center
 heroImage: /uploads/e-saf-value-chain-in-nsw.png
