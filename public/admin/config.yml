@@ -19,7 +19,6 @@ collections:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "One-line description", name: "shortDescription", widget: "string" }
       - { label: "Long details (markdown fallback)", name: "longDetails", widget: "markdown", required: false }
-      - { label: "Flagship project", name: "featured", widget: "boolean", default: false }
       - { label: "List only (do not link to detail page)", name: "listOnly", widget: "boolean", default: false }
 
       - label: "Content Builder"
