@@ -12,6 +12,13 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const md = (s?: string) => (s ? marked.parse(s) : '');
+
+/** Merge new `citations` array with legacy `citation` string */
+const citations: string[] = [
+  ...(Array.isArray(entry.data.citations) ? entry.data.citations : []),
+  ...(entry.data.citation ? [entry.data.citation] : []),
+];
+
 ---
 <BaseLayout title={`${entry.data.title} — Resources — SPARQ Team`}>
   <Section id="resource" title={entry.data.title} subtitle={entry.data.oneLine}>

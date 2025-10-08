@@ -297,6 +297,14 @@ collections:
           - { label: "Label", name: "label", widget: "string" }
           - { label: "File",  name: "file",  widget: "file", media_library: { allow_multiple: false } }
 
+      - label: "Citations"
+        name: "citations"
+        widget: "list"
+        required: false
+        summary: "{{fields.item}}"
+        field:
+          { label: "Citation", name: "item", widget: "text" }
+
       - { label: "Citation (optional)", name: "citation", widget: "string", required: false }
 
       # Optional single URL (kept for compatibility; not required)

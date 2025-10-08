@@ -187,6 +187,7 @@ const resources = defineCollection({
         .array(z.object({ label: z.string(), file: urlLoose }))
         .default([]),
 
+      citations: z.array(z.string()).optional(),
       citation: z.string().optional(),
       url: urlLoose.optional(),          // was required; now optional
       order: numberLoose,
