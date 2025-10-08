@@ -13,9 +13,15 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 const md = (s?: string) => (s ? marked.parse(s) : '');
 
-/** Merge new `citations` array with legacy `citation` string */
-const citations: string[] = [
-  ...(Array.isArray(entry.data.citations) ? entry.data.citations : []),
+const citationsRaw = entry.data.citations ?? [];
+const citations = [
+  ...(
+    Array.isArray(citationsRaw)
+      ? citationsRaw.map((c: any) =>
+          typeof c === 'string' ? c : (c && typeof c.item === 'string' ? c.item : '')
+        )
+      : []
+  ).filter(Boolean),
   ...(entry.data.citation ? [entry.data.citation] : []),
 ];
 
