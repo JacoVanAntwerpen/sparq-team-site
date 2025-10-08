@@ -39,6 +39,5 @@ citations:
     Energy (2023), doi: 10.1016/j.ijhydene.2023.04.177"
   - J. Van Antwerpen, R. Daiyan, R. Amal, P2X Methanol Analysis Tool V1.0.,
     UNSW, 2023
-citation: J. Van Antwerpen, R. Daiyan, R. Amal, P2X Methanol Analysis Tool
-  V1.0., UNSW, 2023
+citation: ""
 ---
