@@ -1,13 +1,8 @@
 ---
 title: HySupply Cost Tool
-oneLine: The HySupply Cost Analysis Tool is a Microsoft Excel Workbook developed
-  to model the hydrogen output and costs involved in the production of green
-  hydrogen from solar, wind and combined solar and wind (referred to as hybrid)
-  power plants in Australia. The tool extends beyond current state-of-the-art
-  models, by providing the user the complete freedom to define their desired
-  plant capacities and design a wide variety of configurations to integrate the
-  electrolyser and the renewable power plant, which include options for a grid
-  connected, off grid and battery connectivity.
+oneLine: Timeseries techno-economic model for simulating green hydrogen
+  production and levelised cost from solar, wind, or hybrid systems under
+  configurable plant, grid, and battery integration scenarios.
 longDetails: >-
   ## Description
 
