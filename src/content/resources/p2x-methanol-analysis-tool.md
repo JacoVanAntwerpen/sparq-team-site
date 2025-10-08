@@ -33,6 +33,12 @@ files:
     file: /uploads/p2x-methanol-analysis-tool-v1.0.xlsm
   - label: Download P2X Methanol analysis Tool User Manual
     file: /uploads/p2x-methanol-analysis-tool-v1.0-user-manual.pdf
+citations:
+  - "Van Antwerpen, J., et al. A model for assessing pathways to integrate
+    intermittent renewable energy for e-methanol production., Int. J. Hydrogen
+    Energy (2023), doi: 10.1016/j.ijhydene.2023.04.177"
+  - J. Van Antwerpen, R. Daiyan, R. Amal, P2X Methanol Analysis Tool V1.0.,
+    UNSW, 2023
 citation: J. Van Antwerpen, R. Daiyan, R. Amal, P2X Methanol Analysis Tool
   V1.0., UNSW, 2023
 ---
