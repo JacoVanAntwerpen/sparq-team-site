@@ -1,5 +1,5 @@
 ---
-prefix: "Dr. "
+prefix: Dr.
 slug: jaco-van-antwerpen
 name: Jaco van Antwerpen
 role: Post-doctoral Research Associate | Renewable Fuels | Techno-economic Specialist
